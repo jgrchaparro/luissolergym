@@ -1,0 +1,35 @@
+# Git / IDE
+.git
+.gitignore
+.idea
+.vs
+.editorconfig
+
+# Dependencias y caché (se regeneran dentro del contenedor)
+vendor
+var/cache/*
+var/log/*
+!var/cache/.gitkeep
+!var/log/.gitkeep
+
+# Archivos de entorno locales — nunca van a la imagen de prod
+.env.local
+.env.*.local
+.env.dev
+.env.test
+
+# Docker (no se necesita dentro del propio contenedor)
+Dockerfile
+.dockerignore
+compose.yaml
+compose.override.yaml
+
+# Sistema / binarios locales
+bin/phpunit
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Documentación / misc
+README.md
+*.md

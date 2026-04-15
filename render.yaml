@@ -1,0 +1,42 @@
+# Blueprint de Render — despliegue con un click
+# https://render.com/docs/blueprint-spec
+#
+# Una vez tengas este archivo en el repo:
+#   1. Ve a https://dashboard.render.com/blueprints
+#   2. "New Blueprint Instance" → apunta al repo
+#   3. Render detecta el Dockerfile y levanta el servicio
+#
+# Los secretos (MONGODB_URL, APP_SECRET) NO se ponen aquí:
+# se configuran desde el dashboard de Render para que no queden en git.
+
+services:
+  - type: web
+    name: fundamental
+    runtime: docker
+    plan: free            # cambia a starter/standard cuando haga falta
+    region: oregon        # cambia si quieres otro region
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_DEBUG
+        value: "0"
+      - key: APP_SECRET
+        generateValue: true      # Render genera un secreto aleatorio
+      # ---- Estos NO se versionan: se llenan en el dashboard ----
+      - key: MONGODB_URL
+        sync: false
+      - key: MONGODB_DB
+        sync: false
+      - key: MOSTRAR_CAPTCHA
+        value: "0"
+      - key: MOSTRAR_NOTIFICACION_PREGUNTAS_SEGURIDAD
+        value: "0"
+      - key: MAILER_DSN
+        sync: false
+      - key: MAIL_SENDER
+        sync: false
+      - key: DEFAULT_URI
+        sync: false              # ej: https://fundamental.onrender.com
