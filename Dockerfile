@@ -2,7 +2,7 @@
 # Dockerfile de PRODUCCIÓN (Render)
 # No se usa en local: local sigue corriendo sobre WAMP con APP_ENV=dev.
 # ---------------------------------------------------------------------------
-FROM php:8.2-apache AS base
+FROM php:8.3-apache AS base
 
 ENV DEBIAN_FRONTEND=noninteractive \
     APP_ENV=prod \
