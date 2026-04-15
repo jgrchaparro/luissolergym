@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Permiso Registrar
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+    <div class="box">
+        <div class="box-header with-border">
+            {% if role.getId() %}
+                Editar Permiso
+            {% else %}
+                Nuevo Permiso
+            {% endif %}
+            <div class="box-tools">
+                <a class="btn btn-default btn-sm" href="{{ path('role_list') }}">
+                    <i class="fa fa-arrow-left"></i>&nbsp;
+                    Listado de Permisos
+                </a>
+            </div>
+        </div>
+        <div class="box-body">
+            {{ form_row(form) }}
+        </div>
+        <div class="box-footer">
+            <button class="btn btn-sm btn-success pull-right" type="submit"><i class="fa fa-save"></i>
+                Registrar
+            </button>
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

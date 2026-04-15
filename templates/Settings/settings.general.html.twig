@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Configuraci&oacute;n General
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Configuraci&oacute;n General</h3>
+                <div class="box-tools">
+                    <a class="btn btn-default btn-sm" href="{{ path('settings_index') }}">
+                        <i class="fa fa-arrow-left"></i>&nbsp;
+                        Volver a Configuraciones
+                    </a>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group {{ form.email_soporte.vars.errors|length > 0 ? 'has-error' : '' }}">
+                            {{ form_label(form.email_soporte) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                                {{ form_widget(form.email_soporte, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            {{ form_errors(form.email_soporte) }}
+                        </div>
+
+                        <div class="form-group {{ form.whatsapp.vars.errors|length > 0 ? 'has-error' : '' }}">
+                            {{ form_label(form.whatsapp) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-whatsapp"></i></span>
+                                {{ form_widget(form.whatsapp, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            {{ form_errors(form.whatsapp) }}
+                        </div>
+
+                        <div class="form-group {{ form.instagram.vars.errors|length > 0 ? 'has-error' : '' }}">
+                            {{ form_label(form.instagram) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-instagram"></i></span>
+                                {{ form_widget(form.instagram, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            {{ form_errors(form.instagram) }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group {{ form.facebook.vars.errors|length > 0 ? 'has-error' : '' }}">
+                            {{ form_label(form.facebook) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-facebook"></i></span>
+                                {{ form_widget(form.facebook, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            {{ form_errors(form.facebook) }}
+                        </div>
+
+                        <div class="form-group {{ form.monto_usd_mes.vars.errors|length > 0 ? 'has-error' : '' }}">
+                            {{ form_label(form.monto_usd_mes) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                {{ form_widget(form.monto_usd_mes, {'attr': {'class': 'form-control', 'step': '0.01', 'min': '0'}}) }}
+                            </div>
+                            {{ form_errors(form.monto_usd_mes) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <button class="btn btn-sm btn-success pull-right" type="submit">
+                    <i class="fa fa-save"></i>
+                    Guardar Configuraci&oacute;n
+                </button>
+            </div>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/toast.js') }}"></script>
+    <script>
+        $(function () {
+            {% for message in app.flashes('success') %}
+                showToast('success', '{{ message }}');
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                showToast('error', '{{ message }}');
+            {% endfor %}
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <title>{% block title %}Login! {% endblock %}</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/logo-login.png') }}"/>
+
+    {% block stylesheets %}
+        <link rel="stylesheet" href=" {{ asset('css/styles.css') }} "/>
+        <link rel="stylesheet" href=" {{ asset('css/movilnet.css') }} "/>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+            }
+            body.signin-body {
+                min-height: 100vh;
+                background:
+                    linear-gradient(135deg, rgba(17, 24, 39, 0.78) 0%, rgba(55, 65, 81, 0.55) 60%, rgba(17, 24, 39, 0.85) 100%),
+                    url('{{ asset('img/fondo-login.png') }}') center center / cover no-repeat fixed;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            }
+            body.signin-body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.35) 100%);
+                pointer-events: none;
+                z-index: 0;
+            }
+            body.signin-body .login-box {
+                position: relative;
+                z-index: 1;
+                margin-top: 0;
+                width: 100%;
+                max-width: 380px;
+                padding: 40px 35px 30px;
+                background: rgba(255, 255, 255, 0.96);
+                border: 1px solid rgba(255, 255, 255, 0.6);
+                border-radius: 16px;
+                box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+            }
+            body.signin-body .login-logo {
+                text-align: center;
+                margin-bottom: 25px;
+            }
+            body.signin-body .login-logo img {
+                max-width: 180px;
+                height: auto;
+            }
+            body.signin-body .login-box-body {
+                background: transparent;
+                padding: 0;
+                box-shadow: none;
+                border: 0;
+            }
+            body.signin-body .form-group {
+                margin-bottom: 18px;
+            }
+            body.signin-body .form-control {
+                height: 46px;
+                border-radius: 10px;
+                border: 1px solid #e5e7eb;
+                background: #f9fafb;
+                box-shadow: none;
+                transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+                padding-left: 14px;
+                padding-right: 40px;
+            }
+            body.signin-body .form-control:focus {
+                border-color: #374151;
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.12);
+                outline: 0;
+            }
+            body.signin-body .form-control-feedback {
+                line-height: 46px;
+                color: #9ca3af;
+            }
+            body.signin-body .btn-primary.btn-flat {
+                background-color: #111827;
+                border-color: #111827;
+                border-radius: 10px;
+                padding: 10px 22px;
+                font-weight: 600;
+                letter-spacing: .3px;
+                transition: background-color .2s ease, transform .1s ease;
+            }
+            body.signin-body .btn-primary.btn-flat:hover {
+                background-color: #374151;
+                border-color: #374151;
+            }
+            body.signin-body .btn-primary.btn-flat:active {
+                transform: translateY(1px);
+            }
+            body.signin-body .forgot {
+                background: transparent;
+                border: 0;
+                color: #6b7280;
+                padding: 10px 0;
+                font-size: 13px;
+                text-decoration: none;
+                box-shadow: none;
+            }
+            body.signin-body .forgot:hover,
+            body.signin-body .forgot:focus {
+                color: #111827;
+                background: transparent;
+                text-decoration: underline;
+            }
+            body.signin-body .alert-warning.bg-movilnet {
+                border-radius: 10px;
+                border: 0;
+                color: #fff;
+                font-size: 13px;
+            }
+            @media (max-width: 480px) {
+                body.signin-body .login-box {
+                    margin: 16px;
+                    padding: 30px 22px 22px;
+                }
+            }
+        </style>
+    {% endblock %}
+
+    <script src="{{ asset('js/javascript.gulp.js') }}"></script>
+</head>
+<body class="signin-body">
+
+{% trans_default_domain 'NucleosUserBundle' %}
+
+{% block nucleos_user_content %}
+    <div class="login-box">
+        <div class="login-logo">
+            <img src="{{ asset('img/luissolergym-logo-login.png') }}" width="200">
+        </div>
+        <!-- /.login-logo -->
+        <div class="login-box-body">
+            <form action="{{ path("nucleos_user_security_check") }}" method="post" class="login-form" id="login-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
+                <div class="form-group has-feedback">
+                    <input type="text" class="form-control" placeholder="Usuario" autofocus id="username"
+                           name="_username" value="{{ last_username }}" required="required"/>
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="password" id="password" name="_password" required="required" class="form-control"
+                           placeholder="Contraseña" autocomplete="current-password"/>
+                    <span id="icon-password" class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+
+                <div style="padding: 10px 0;">
+                    <a href="{{ path('user_login_recuperacion_password', {username : last_username}) }}" class="btn btn-primary btn-sm forgot">
+                        Olvid&oacute; su contraseña?
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-flat pull-right" id="btn-submit">Ingresar</button>
+                </div>
+            </form>
+            {% for type, flashes in app.flashes %}
+                {% for flash in flashes %}
+                    <div class="alert alert-warning bg-movilnet" style="margin-top: 10px">
+                        {{ flash }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% if error %}
+                <div class="alert alert-warning bg-movilnet"
+                     style="margin-top: 20px;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+        </div>
+
+        <!-- /.login-box-body -->
+    </div><!-- /.login-box -->
+{% endblock nucleos_user_content %}
+
+<script>
+    // Verificar que jQuery esté disponible
+    if (typeof $ !== 'undefined') {
+        $(function () {
+            const passwordField = $('#password');
+            const icon = $('#icon-password');
+
+            // Toggle mostrar/ocultar contraseña
+            passwordField.on('input', function () {
+                if ($(this).val().length > 0) {
+                    icon.removeClass('glyphicon glyphicon-lock').addClass('fa fa-eye-slash');
+                    icon.css({
+                        'pointer-events': 'auto',
+                        'cursor': 'pointer'
+                    });
+                } else {
+                    icon.removeClass('fa fa-eye-slash fa-eye').addClass('glyphicon glyphicon-lock');
+                    icon.css({
+                        'pointer-events': 'none',
+                        'cursor': 'default'
+                    });
+                }
+            });
+
+            icon.on('click', function () {
+                if (passwordField.val().length > 0) {
+                    const isPassword = passwordField.attr('type') === 'password';
+                    passwordField.attr('type', isPassword ? 'text' : 'password');
+                    icon.toggleClass('fa-eye', isPassword);
+                    icon.toggleClass('fa-eye-slash', !isPassword);
+                    passwordField.focus();
+                }
+            });
+
+            // Debug: verificar que el formulario se envía
+            $('#login-form').on('submit', function(e) {
+                // e.preventDefault();
+                console.log('Formulario enviándose...');
+                console.log('Usuario:', $('#username').val());
+                console.log('Action:', $(this).attr('action'));
+            });
+        });
+    } else {
+        console.error('jQuery no está cargado');
+        document.getElementById('btn-submit').addEventListener('click', function(e) {
+            console.log('Submit sin jQuery');
+        });
+    }
+</script>
+</body>
+</html>

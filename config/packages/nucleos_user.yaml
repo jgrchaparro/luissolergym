@@ -1,0 +1,10 @@
+nucleos_user:
+    firewall_name: main
+    user_class: App\Document\User
+    model_manager_name: default
+#    model_manager_name: null
+    from_email: noreply@tuapp.com
+    group:
+        group_class: App\Document\UserGroup
+    loggedin:
+        route: nucleos_user_profile_show

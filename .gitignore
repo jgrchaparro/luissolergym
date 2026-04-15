@@ -1,0 +1,13 @@
+
+###> ide ###
+/.idea/
+###< ide ###
+
+###> symfony/framework-bundle ###
+/.env.dev
+/.env.prod
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###

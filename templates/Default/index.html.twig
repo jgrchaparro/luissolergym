@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Movilnet
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="text-center">
+            <img class="logo-index" src="{{ asset('img/luissolergym-logo-login.png') }}" alt="">
+        </div>
+    </div>
+
+    {% include 'Default/modal.notificacion.responder.preguntas.seguridad.html.twig' %}
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let showNotificacion = '{{ showNotificacion }}'
+        let modalNotificacion = '{{ notificacion }}';
+        let $btnCerrarModal = $('#btn-cerrar-modal');
+        let $btnContestar = $('#btn-contestar');
+        let $modalNotificacion = $('#staticBackdrop');
+        $(function () {
+            if (modalNotificacion !== '0' && showNotificacion === '1') {
+                let url = "{{ path('usuarios_validar_numero_respuestas_preguntas_seguridad') }}"
+                $.getJSON(url, function (data) {
+                    if (!data['response']) {
+                        $modalNotificacion.modal('show')
+                    }
+                });
+            }
+        });
+        $btnContestar.on('click', function () {
+            $btnContestar.attr('disabled', true);
+            $btnCerrarModal.attr('disabled', true);
+        });
+    </script>
+{% endblock %}

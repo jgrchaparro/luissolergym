@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Preguntas de Seguridad
+{% endblock %}
+
+{% block body %}
+    <div class="box">
+        <div class="box-header with-border">
+            Preguntas de Seguridad
+            <div class="box-tools">
+                <a class="btn btn-default btn-sm" href="{{ path('settings_index') }}">
+                    <i class="fa fa-arrow-left"></i>&nbsp;
+                    Configuraciones
+                </a>
+                {% if is_granted('ROLE_ADD_QUESTION') %}
+                    <button class="btn btn-default btn-sm" id="crearPregunta">
+                        <i class="fa fa-plus"></i>&nbsp;
+                        Crear Pregunta
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+    <div class="box">
+        <div class="box-body">
+            <table class="table" id="tablePreguntas">
+                <thead>
+                <tr>
+                    <th>Descripci&oacute;n</th>
+                    <th class="text-right"><i class="fa fa-cogs fa-fw"></i>Acciones</th>
+                </tr>
+                </thead>
+                {% for pregunta in preguntas %}
+                    <tr>
+                        <td>{{ pregunta.description }}</td>
+                        <td class="text-right">
+                            {% if is_granted('ROLE_DELETE_QUESTION_CONFIGURACIONES') %}
+                                <a class="btn btn-danger btn-sm"
+                                   href="{{ path('security_question_delete', {id: pregunta.id}) }}">
+                                    Eliminar
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {{ include('/security/modal.crear.pregunta.seguridad.html.twig') }}
+{% endblock %}
+{% block javascripts %}
+    <script>
+        let error = '{{ error }}'
+        let $inputDescription = document.getElementById('user_questions_description')
+        let $btnCrearPregunta = $('#crearPregunta')
+        let formCrearPreguntas = document.getElementById('formCrearPreguntasSeguridad');
+        let $btnGuardarPregunta = $('#guardarPreguntas')
+        let $btnCancelGuardarPregunta = $('#btnCancelPreguntaSeguridad')
+
+        $(function () {
+            $('#tablePreguntas').DataTable({
+                "oLanguage": {
+                    "sProcessing": '<div class="text-center" style="font-size: 16px">Cargando, favor espere ... </div>' + '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',
+                    "sInfo": "Un total de _TOTAL_ registros para mostrar (_START_ a _END_)",
+                    "sLengthMenu": "Mostrando _MENU_ registros",
+                    "oPaginate": {
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "sEmptyTable": "No se encontraron registros",
+                    "sInfoEmpty": "_TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+            if(error === '1'){
+                $('#modalCrearPreguntasSeguridad').modal('show')
+            }
+        });
+
+        $btnCrearPregunta.on('click', function () {
+            $('#modalCrearPreguntasSeguridad').modal('show')
+            $inputDescription.focus();
+        })
+        formCrearPreguntas.addEventListener('submit', function () {
+            $btnGuardarPregunta.attr('disabled', true);
+            $btnCancelGuardarPregunta.attr('disabled', true);
+        });
+    </script>
+{% endblock %}

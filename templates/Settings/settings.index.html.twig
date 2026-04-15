@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Configuracion
+{% endblock %}
+
+{% block body %}
+    <div class="info-box">
+        <span class="info-box-icon bg-yellow">
+            <i class="fa fa-users"></i>
+        </span>
+        <div class="info-box-content">
+            {% if is_granted('ROLE_USER_LIST') %}
+                <span class="info-box-text">
+                    <a href="{{ path('usuarios_index') }}">Usuarios</a>
+                </span>
+            {% endif %}
+            {% if is_granted('ROLE_GROUP_LIST') %}
+                <span class="info-box-text">
+                    <a href="{{ path('group_list') }}">Roles</a>
+                </span>
+            {% endif %}
+            {% if is_granted('ROLE_LIST_ROLE') %}
+                <span class="info-box-text">
+                    <a href="{{ path('role_list') }}">Permisos</a>
+                </span>
+            {% endif %}
+            {% if is_granted('ROLE_LIST_QUESTIONS') %}
+                <span class="info-box-text">
+                        <a href="{{ path('security_questions_list') }}">Preguntas de Seguridad</a>
+                </span>
+            {% endif %}
+            <span class="info-box-number"></span>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <span class="info-box-icon bg-aqua">
+            <i class="fa fa-sliders"></i>
+        </span>
+        <div class="info-box-content">
+            <span class="info-box-text">
+                <a href="{{ path('settings_general') }}">Configuraci&oacute;n General</a>
+            </span>
+            <span class="info-box-number">Email, Redes Sociales, Monto USD</span>
+        </div>
+    </div>
+
+
+    {#    <div class="info-box"> #}
+    {#        <span class="info-box-icon bg-aqua-active"> #}
+    {#            <i class="fa fa-cogs"></i> #}
+    {#        </span> #}
+    {#        <div class="info-box-content"> #}
+    {#            <span class="info-box-text"> #}
+    {#                <a href="{{ path('reglas_movilnet_index') }}">Reglas</a> #}
+    {#            </span> #}
+    {#            <span class="info-box-text"> #}
+    {#                <a href="{{ path('super_codigos_respuesta_index') }}">C&oacute;digos de Respuesta</a> #}
+    {#            </span> #}
+    {#            <span class="info-box-text"> #}
+    {#                <a href="{{ path('codigos_base_listar') }}">C&oacute;digos Base</a> #}
+    {#            </span> #}
+    {#            <span class="info-box-text"> #}
+    {#                <a href="{{ path('super_topes') }}">Topes</a> #}
+    {#            </span> #}
+    {#            <span class="info-box-number"></span> #}
+    {#        </div> #}
+    {#    </div> #}
+    {#    <div class="info-box"> #}
+    {#        <span class="info-box-icon bg-black-gradient"> #}
+    {#            <i class="fa fa-files-o"></i> #}
+    {#        </span> #}
+    {#        <div class="info-box-content"> #}
+    {#            <span class="info-box-text"> #}
+    {#                <a href="{{ path('listanegra_tipos') }}">Tipos de lista negra</a> #}
+    {#            </span> #}
+    {#            <span class="info-box-text"> #}
+    {#                <a href="{{ path('listanegra_entries') }}">Lista Negra</a> #}
+    {#            </span> #}
+    {#            <span class="info-box-number"></span> #}
+    {#        </div> #}
+    {#    </div> #}
+{% endblock %}

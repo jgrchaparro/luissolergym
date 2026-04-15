@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Movilnet::Usuario Registrar
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form, {'attr': {class: 'form-user'}}) }}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="box">
+                <div class="box-header with-border">
+                    Nuevo Usuario
+                    <div class="box-tools">
+                        <a class="btn btn-default btn-sm" href="{{ path('usuarios_index') }}">
+                            <i class="fa fa-arrow-left"></i>&nbsp;
+                            Listado de Usuarios
+                        </a>
+                    </div>
+                </div>
+                {% if not form.vars.valid and form.vars.errors|length > 0 %}
+                    <div class="box-body">
+                        <div class="alert alert-danger">
+                            <h4><i class="icon fa fa-ban"></i> Error</h4>
+                            {{ form_errors(form) }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {{ include('security/user.datos.html.twig') }}
+                <div class="box-footer">
+                    <button id="btnGuardar" class="btn btn-sm btn-success pull-right" type="submit">
+                        <i class="fa fa-save"></i>
+                        Registrar
+                    </button>
+                </div>
+            </div>
+            {# ⭐ MENSAJES FLASH #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash-notice">
+                        <div class="box box-{{ label == 'success' ? 'success' : 'danger' }} box-solid">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">{{ label == 'success' ? 'Éxito' : 'Error' }}</h3>
+                                <div class="box-tools pull-right">
+                                    <button class="btn btn-box-tool" data-widget="remove">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body">
+                                {{ message }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

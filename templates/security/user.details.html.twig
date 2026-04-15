@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Usuario
+{% endblock %}
+
+{% block body %}
+    <div class="box">
+        <div class="box-header">
+            Usuario
+            <div class="box-tools btn-group">
+                <a class="btn btn-default btn-sm" href="{{ path('usuarios_index') }}">
+                    <i class="fa fa-list fa-fw"></i>&nbsp;
+                    Listado de Usuarios
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="box">
+                <div class="box-header with-border">
+                    Usuario
+                    {% if is_granted('ROLE_USER_EDIT') %}
+                        <div class="box-tools">
+                            <a href="{{ path('usuario_editar', {'id':user.id}) }}" class="btn btn-sm btn-default">
+                                <i class="fa fa-edit"></i>
+                                Modificar
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="box-body no-padding">
+                    <table class="table">
+                        <tr>
+                            <th>Usuario</th>
+                            <td>{{ user.usernameCanonical | default('') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ user.emailCanonical | default('') }}</td>
+                        </tr>
+                        <tr id="status">
+                            {% set estado = user.enabled ? 'Desactivar':'Activar' %}
+                            <th>Status</th>
+                            <td>{{ user.enabled ? 'Activo' : 'Inactivo' }}
+                                {% if is_granted('ROLE_ACTIVAR_DESACTIVAR_USUARIO') %}
+                                    <a href="{{ path('user_change_enabled', {id : user.id}) }}"
+                                       class="btn btn-default btn-sm pull-right" id="btn-enabled">
+                                        <span>{{ estado }}</span></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8" ng-app="ngMainApp" ng-controller="ngUserGroupController as $ctrl">
+            <div class="box">
+                <div class="box-header with-border">
+                    Grupos
+                </div>
+                <div class="box-body no-padding">
+                    <table class="table">
+                        {% for group in grupos %}
+                            {% set checked = '' %}
+                            {% if user.group(group.name) %}
+                                {% set checked = 'checked' %}
+                            {% endif %}
+                            <tr>
+                                <td>
+                                    <label for="check[{{ group.id }}]">
+                                        {{ group.name }}
+                                    </label>
+                                </td>
+                                <td class="text-right">
+                                    <input type="checkbox" id="check[{{ group.id }}]" {{ checked }}
+                                           ng-click="$ctrl.checkGroup('{{ group.id }}', '{{ user.id }}' )">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/security/app.js') }}"></script>
+    <script src="{{ asset('js/security/user-groups.js') }}"></script>
+    <script>
+        let $status = '{{ user.enabled }}'
+        let $trStatus = $('#status')
+        let $btnEnabled = $('#btn-enabled')
+        $(function () {
+            let $bg = $status ? 'bg-success' : 'bg-danger';
+            $trStatus.addClass($bg);
+        });
+        $btnEnabled.on('click', function (){
+            $btnEnabled.attr('disabled', true)
+        })
+    </script>
+{% endblock javascripts %}

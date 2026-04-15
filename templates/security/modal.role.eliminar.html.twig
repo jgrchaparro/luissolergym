@@ -1,0 +1,36 @@
+<div class="modal" id="modalRoleEliminar" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close">×</button>
+                <h4 class="box-title">Confirmaci&oacute;n</h4>
+            </div>
+            <div class="box-body text-bold" style="font-size: 18px">
+                ¿Est&aacute; seguro de eliminar el Rol?
+            </div>
+            <div class="modal-body " style="font-size: 24px;">
+                <table class="table table-bordered table-striped table-hover" style="font-size: 20px;">
+                    <tr>
+                        <th>Rol</th>
+                        <td> {{ role.role}}</td>
+                    </tr>
+                    <tr>
+                        <th>Descripci&oacute;n</th>
+                        <td> {{ role.descripcion}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button id="btnCancelRole" class="btn btn-flat btn-danger pull-left" data-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <a  href="{{ path('role_eliminar',{id:role.id}) }}"
+                        class="btn btn-flat btn-success" id="eliminarRole">
+                        Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+nucleos_user_security:
+    resource: "@NucleosUserBundle/Resources/config/routing/security.php"
+
+nucleos_user_resetting:
+    resource: "@NucleosUserBundle/Resources/config/routing/resetting.php"
+    prefix: /resetting
+
+#nucleos_user_change_password:
+#    resource: "@NucleosUserBundle/Resources/config/routing/change_password.php"
+#    prefix: /profile
+
+#nucleos_user_profile:
+#    resource: "@NucleosUserBundle/Resources/config/routing/profile.php"
+#    prefix: /profile
+
+#nucleos_user_register:
+#    resource: "@NucleosUserBundle/Resources/config/routing/registration.php"
+#    prefix: /register

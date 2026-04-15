@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Movilnet::Usuarios
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Filtros</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                    class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <input id="filtroBusqueda" class="form-control" placeholder="Ingrese b&uacute;squeda"
+                           title="Ingrese el Nombre de usuario, Correo electr&oacute;nico o Nombre que desea buscar">
+                </div>
+                <div class="box-footer">
+                    <button type="button" onclick="updateTable()" class="btn btn-primary btn-sm pull-right">
+                        <i class="fa fa-fw fa-filter"></i>
+                        Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Usuarios</h3>
+                    <div class="box-tools">
+                        <a class="btn btn-default btn-sm" href="{{ path('settings_index') }}">
+                            <i class="fa fa-arrow-left"></i>&nbsp;
+                            Configuraciones
+                        </a>
+                        {% if is_granted('ROLE_USER_CREATE') %}
+                        <a href="{{ path('usuario_registrar') }}" class="btn btn-primary btn-sm">&nbsp;
+                            <i class="fa fa-user-plus"></i>
+                            Agregar usuario
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="table-responsive">
+                        <table id="tableUsuarios" class="table table-hover table-striped table-condensed" style="width: 100%">
+                            <thead>
+                            <th></th>
+                            <th>Nombre de usuario</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Cedula</th>
+                            <th>Telefono</th>
+                            <th>Unidad</th>
+                            <th>Rol</th>
+                            <th class="text-right">Activo</th>
+
+                            <th class="pull-right">
+                                <i class="fa fa-gears"></i>
+                                Acciones
+                            </th>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        var table;
+
+        $(document).ready(function () {
+            table = $('#tableUsuarios').DataTable({
+                "sDom": "ltipr",
+                "deferLoading": 0,
+                "processing": true,
+                "serverSide": true,
+                "ajax": "{{ path('usuarios_listar') }}",
+                "columnDefs": [
+                    {
+                        "visible": false,
+                        "targets": [0]
+                    },
+                    {
+                        "orderable": false,
+                        "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                    },
+                ],
+                "oLanguage": {
+                    "sProcessing": "Buscando información, por favor espere...",
+                    "sInfo": "Un total de _TOTAL_ registros para mostrar (_START_ a _END_)",
+                    "sLengthMenu": "Mostrando _MENU_ registros",
+                    "oPaginate": {
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "sEmptyTable": "No se encontraron registros",
+                    "sInfoEmpty": "_TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+
+            $("#tableUsuarios tbody").on('click', ".btn-user-detalle", function () {
+                var data = table.row($(this).parents('tr')).data();
+                var id = data[0];
+                var url = Routing.generate('user_details', {id: id});
+
+                location.href = url;
+            });
+
+            updateTable();
+        });
+
+        function updateTable() {
+            table.columns(0).search($('#filtroBusqueda').val());
+            table.draw();
+        }
+    </script>
+{% endblock %}

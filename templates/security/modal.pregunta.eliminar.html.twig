@@ -1,0 +1,32 @@
+<div class="modal" id="modalPreguntaEliminar" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close">×</button>
+                <h4 class="box-title">Confirmaci&oacute;n</h4>
+            </div>
+            <div class="box-body text-bold" style="font-size: 18px">
+                ¿Est&aacute; seguro de eliminar la Pregunta?
+            </div>
+            <div class="modal-body " style="font-size: 24px;">
+                <table class="table table-bordered table-striped table-hover" style="font-size: 20px;">
+                    <tr>
+                        <th>Descripci&oacute;n</th>
+                        <td> {{ pregunta.description}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button id="btnCancelPregunta" class="btn btn-flat btn-danger pull-left" data-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <a  href="{{ path('security_question_delete', {id : pregunta.id}) }}"
+                        class="btn btn-flat btn-success" id="eliminarPregunta">
+                        Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

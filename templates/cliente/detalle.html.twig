@@ -1,0 +1,254 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}Detalle del Cliente{% endblock %}
+
+{% block body %}
+    <div ng-app="ngMainApp" ng-controller="ngClienteDetalleController as $ctrl"
+         ng-init="$ctrl.init('{{ cliente.id }}')">
+    <div class="box">
+        <div class="box-header with-border">
+            <i class="fa fa-user fa-fw"></i> Detalle del Cliente
+            <div class="box-tools">
+                <a class="btn btn-default btn-sm" href="{{ path('cliente_list') }}">
+                    <i class="fa fa-arrow-left"></i>&nbsp;
+                    Volver al Listado
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# ===== DATOS DEL CLIENTE ===== #}
+        <div class="col-md-4">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-id-card fa-fw"></i> Datos del Cliente</h3>
+                </div>
+                <div class="box-body no-padding">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 130px;">C&eacute;dula</th>
+                            <td>{{ cliente.cedula }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nombres</th>
+                            <td>{{ cliente.nombres }}</td>
+                        </tr>
+                        <tr>
+                            <th>Apellidos</th>
+                            <td>{{ cliente.apellidos }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ cliente.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tel&eacute;fono</th>
+                            <td>{{ cliente.telefono }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fecha Registro</th>
+                            <td>{{ cliente.fechaCreacion ? cliente.fechaCreacion|date('d/m/Y H:i') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Estado</th>
+                            <td>
+                                {% if cliente.activo %}
+                                    <span class="label label-success">Activo</span>
+                                {% else %}
+                                    <span class="label label-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Solvente</th>
+                            <td>
+                                {% if cliente.solvente %}
+                                    <span class="label label-success">S&iacute;</span>
+                                {% else %}
+                                    <span class="label label-warning">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if cliente.fechaCorte %}
+                            <tr>
+                                <th>Fecha Corte</th>
+                                <td>{{ cliente.fechaCorte|date('d/m/Y') }}</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            {# ===== TIPO MENSUALIDAD ===== #}
+            {% set tipoMens = cliente.tipoMensualidad %}
+            {% if tipoMens %}
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-list-alt fa-fw"></i> Tipo de Mensualidad</h3>
+                        <span class="label label-info pull-right" style="margin-top: 3px;">{{ tipoMens.codigo }}</span>
+                    </div>
+                    <div class="box-body no-padding">
+                        <table class="table">
+                            <tr>
+                                <th style="width: 130px;">Opciones</th>
+                                <td>
+                                    {% set opciones = tipoMens.descripcion ? tipoMens.descripcion|split(',') : [] %}
+                                    {% for opcion in opciones %}
+                                        <span class="label label-primary" style="margin-right: 4px; display: inline-block; margin-bottom: 4px;">
+                                            {{ opcion|trim }}
+                                        </span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Monto USD</th>
+                                <td><strong>$ {{ tipoMens.monto|number_format(2, ',', '.') }}</strong></td>
+                            </tr>
+                            {% if ultimaTasa %}
+                                <tr>
+                                    <th>Monto VEF</th>
+                                    <td>
+                                        Bs. {{ (tipoMens.monto * ultimaTasa.usdVef)|number_format(2, ',', '.') }}
+                                        <small class="text-muted">(Tasa: {{ ultimaTasa.usdVef|number_format(2, ',', '.') }})</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Monto COP</th>
+                                    <td>
+                                        $ {{ (tipoMens.monto * ultimaTasa.usdCop)|number_format(2, ',', '.') }} COP
+                                        <small class="text-muted">(Tasa: {{ ultimaTasa.usdCop|number_format(2, ',', '.') }})</small>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div class="box box-default">
+                    <div class="box-body text-center text-muted" style="padding: 20px;">
+                        <i class="fa fa-info-circle"></i> Sin tipo de mensualidad asignado
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        {# ===== MOVIMIENTOS / PAGOS ===== #}
+        <div class="col-md-8">
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <h3 class="box-title"><i class="fa fa-money fa-fw"></i> Pagos Realizados</h3>
+                    <div class="box-tools">
+                        <button class="btn btn-default btn-sm" ng-click="$ctrl.abrirModalPago()">
+                            <i class="fa fa-plus"></i>&nbsp; Agregar Pago
+                        </button>
+                        <span class="label label-default" style="margin-left: 6px;">{{ movimientos|length }} registro(s)</span>
+                    </div>
+                </div>
+                <div class="box-body no-padding">
+                    {% if movimientos|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo Movimiento</th>
+                                    <th>Tipo Pago</th>
+                                    <th class="text-right">Monto</th>
+                                    <th>Observaciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for movimiento in movimientos %}
+                                    <tr>
+                                        <td>{{ movimiento.fechaCreacion ? movimiento.fechaCreacion|date('d/m/Y H:i') : '' }}</td>
+                                        <td>{{ movimiento.tipoMvto }}</td>
+                                        <td>
+                                            {% if movimiento.tipoPago %}
+                                                {{ movimiento.tipoPago.codigo }} - {{ movimiento.tipoPago.descripcion }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-right">{{ movimiento.monto|number_format(2, ',', '.') }}</td>
+                                        <td>{{ movimiento.observaciones }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center" style="padding: 40px;">
+                            <i class="fa fa-inbox fa-3x text-muted"></i>
+                            <p class="text-muted" style="margin-top: 10px;">No se encontraron pagos registrados.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ===== MODAL AGREGAR PAGO ===== #}
+    <div class="modal" id="modalAgregarPago" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="box-title">
+                        <i class="fa fa-money fa-fw"></i> Registrar Pago
+                    </h4>
+                </div>
+                <form name="pagoForm" ng-submit="$ctrl.guardarPago()">
+                    <div class="modal-body">
+                        <div class="alert alert-danger" ng-show="$ctrl.error">
+                            <i class="fa fa-ban"></i> {% verbatim %}{{ $ctrl.error }}{% endverbatim %}
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Pago <span class="text-danger">*</span></label>
+                            <select class="form-control" ng-model="$ctrl.pago.tipo_pago_id" required>
+                                <option value="">-- Seleccione --</option>
+                                <option ng-repeat="tp in $ctrl.tiposPago" value="{% verbatim %}{{ tp.id }}{% endverbatim %}">
+                                    {% verbatim %}{{ tp.codigo }} - {{ tp.descripcion }}{% endverbatim %}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                <input type="number" step="0.01" min="0.01" class="form-control"
+                                       ng-model="$ctrl.pago.monto" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Observaciones</label>
+                            <textarea class="form-control" rows="3" ng-model="$ctrl.pago.observaciones"
+                                      placeholder="Observaciones (opcional)"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-flat btn-primary" ng-disabled="$ctrl.guardando">
+                            <i class="fa fa-save"></i> Registrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/toast.js') }}"></script>
+    <script src="{{ asset('js/appInit.js') }}"></script>
+    <script src="{{ asset('js/angular/cliente-detalle-controller.js') }}"></script>
+{% endblock %}

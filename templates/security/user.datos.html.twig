@@ -1,0 +1,82 @@
+<div class="box-body">
+    {# USERNAME #}
+    {{ form_row(form.username, {
+        'attr': {
+            'pattern': '[a-zA-Z0-9_-]+',
+            'oninput': "this.value = this.value.replace(/[^a-zA-Z0-9_-]/g, '')",
+            'title': 'Solo se permiten letras, números, guiones (-) y guiones bajos (_)'
+        } | merge(user.getId() ? {'disabled': true} : {})
+    }) }}
+
+    {% if user.getId() %}
+        <input type="hidden" name="{{ form.username.vars.full_name }}" value="{{ user.getUsername() }}">
+    {% endif %}
+
+    {# NOMBRE #}
+    {{ form_row(form.nombre, {
+        'attr': {
+            'placeholder': 'Ingrese nombre de usuario maximo 100 caracteres',
+            'maxlength': 100,
+            'pattern': '[a-zA-Z ]*',
+            'oninput': "this.value = this.value.replace(/[^a-zA-Z ]/g, '')"
+        } | merge((user.getId() and not is_granted('ROLE_USER_EDIT_NOMBRE')) ? {'disabled': true} : {})
+    }) }}
+
+    {% if user.getId() and not is_granted('ROLE_USER_EDIT_NOMBRE') %}
+        <input type="hidden" name="{{ form.nombre.vars.full_name }}" value="{{ user.getNombre() }}"/>
+    {% endif %}
+
+    {# EMAIL #}
+    {{ form_row(form.email, {
+        'attr': {}
+        | merge((user.getId() and not is_granted('ROLE_USER_EDIT_EMAIL')) ? {'disabled': true} : {})
+    }) }}
+
+    {% if user.getId() and not is_granted('ROLE_USER_EDIT_EMAIL') %}
+        <input type="hidden" name="{{ form.email.vars.full_name }}" value="{{ user.getEmail() }}"/>
+    {% endif %}
+
+    {# CEDULA #}
+    {{ form_row(form.cedula, {
+        'attr': {
+            'pattern': '[a-zA-Z0-9_-]{1,9}',
+            'maxlength': '9',
+            'oninput': "this.value = this.value.replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 9)",
+            'title': 'Máximo 9 digitos'
+        } | merge((user.getId() and not is_granted('ROLE_USER_EDIT_CEDULA')) ? {'disabled': true} : {})
+    }) }}
+
+    {% if user.getId() and not is_granted('ROLE_USER_EDIT_CEDULA') %}
+        <input type="hidden" name="{{ form.cedula.vars.full_name }}" value="{{ user.getCedula() }}"/>
+    {% endif %}
+
+    {# TELEFONO #}
+    {{ form_row(form.telefono, {
+        'attr': {
+            'pattern': '[0-9]{11}',
+            'maxlength': '11',
+            'oninput': "this.value = this.value.replace(/[^0-9]/g, '').substring(0, 11)",
+            'title': 'Solo se permiten 11 dígitos numéricos'
+        } | merge((user.getId() and not is_granted('ROLE_USER_EDIT_TELEFONO')) ? {'disabled': true} : {})
+    }) }}
+
+    {% if user.getId() and not is_granted('ROLE_USER_EDIT_TELEFONO') %}
+        <input type="hidden" name="{{ form.telefono.vars.full_name }}" value="{{ user.getTelefono() }}"/>
+    {% endif %}
+
+    {# UNIDAD #}
+    {{ form_row(form.unidad, {
+        'attr': {
+            'maxlength': '100',
+        } | merge((user.getId() and not is_granted('ROLE_USER_EDIT_UNIDAD')) ? {'disabled': true} : {})
+    }) }}
+
+    {% if user.getId() and not is_granted('ROLE_USER_EDIT_UNIDAD') %}
+        <input type="hidden" name="{{ form.unidad.vars.full_name }}" value="{{ user.getUnidad() }}"/>
+    {% endif %}
+
+    {# PREGUNTAS Y RESPUESTAS #}
+    {{ form_row(form.questions) }}
+    {{ form_row(form.answer) }}
+    {{ form_row(form.plainPassword) }}
+</div>

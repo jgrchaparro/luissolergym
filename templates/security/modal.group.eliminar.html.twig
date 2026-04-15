@@ -1,0 +1,32 @@
+<div class="modal" id="modalGroupEliminar" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close">×</button>
+                <h4 class="box-title">Confirmaci&oacute;n</h4>
+            </div>
+            <div class="box-body text-bold" style="font-size: 18px">
+                ¿Est&aacute; seguro de eliminar el Grupo?
+            </div>
+            <div class="modal-body " style="font-size: 24px;">
+                <table class="table table-bordered table-striped table-hover" style="font-size: 20px;">
+                    <tr>
+                        <th>Grupo</th>
+                        <td> {{ group.name}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button id="btnCancel" class="btn btn-flat btn-danger pull-left" data-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <a  href="{{ path('group_eliminar',{id:group.id}) }}"
+                        class="btn btn-flat btn-success">
+                        Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

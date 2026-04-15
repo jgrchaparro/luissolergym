@@ -1,0 +1,25 @@
+ROLE_GROUP_LIST;Permite listar todos los grupos registrados
+ROLE_GROUP_DETAILS;Permite ver el detalle de los grupos
+ROLE_GROUP_EDIT;Permite editar la información de un grupo
+ROLE_GROUP_ADD;Permite agregar grupos
+ROLE_USER_DETAILS;Permite ver el detalle de un usuario
+ROLE_USER_CREATE;Permite crear un nuevo usuario
+ROLE_USER_EDIT;Permite editar la información de un usuario
+ROLE_USER_LIST;Permite listar todos los usuarios registrados
+ROLE_ADD_ROLE;Permite crear nuevos roles de acceso a los usuarios
+ROLE_DELETE_ROLE;Permite eliminar permisos
+ROLE_GROUP_DELETE;Permite eliminar un grupo
+ROLE_VER_BOTON_CONFIGURACIONES_MENU_PRINCIPAL;Permite ver el botón de Configuraciones desde el Menú Principal
+ROLE_DETAILS_ROLE;Permite ver el detalle de los permisos
+ROLE_EDIT_ROLE;Permite editar la información de un permiso
+ROLE_VER_BOTON_REGISTRAR_SETTINGS;Permite ver el botón registrar en settings del recaudador"
+ROLE_PERFIL_EDIT;Permite acceder a la seccion de editar la información de los usuarios
+ROLE_PERFIL_EDITAR_USERNAME;Cambiar el username del usuario
+ROLE_PERFIL_EDITAR_EMAIL;Cambiar el email del usuario
+ROLE_MODIFICAR_PERMISOS_ROLES;Permite modificar los permisos de acceso a un rol
+ROLE_LIST_QUESTIONS;Permite ver la lista de preguntas de seguridad
+ROLE_ADD_QUESTION;Permite agregar preguntas de seguridad
+ROLE_DELETE_QUESTION_CONFIGURACIONES;Permite eliminar una pregunta de seguridad en el panel de configuraciones
+ROLE_ANSWER_SECURITY_QUESTIONS_PERFIL_USUARIO;Permite contestar las preguntas de seguridad
+ROLE_ELIMINAR_PREGUNTAS_SEGURIDAD_PERFIL_USUARIO;Permite eliminar una pregunta de seguridad en el perfil de usuario
+ROLE_SECCION_SECURITY_QUESTIONS_PERFIL_USUARIO;Permite ver la sección de responder preguntas de seguridad en el perfil del usuario

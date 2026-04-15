@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+{% form_theme formAnswer 'bootstrap_3_layout.html.twig' %}
+
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Movilnet::Usuario Registrar
+{% endblock %}
+
+{% block body %}
+    <div class="box">
+        <div class="box-header with-border">
+            Editar Usuario
+            <div class="box-tools btn-group">
+                {% if is_granted('ROLE_USER_EDIT') %}
+                    <a href="{{ path('user_details',{id:user.id}) }}" class="btn btn-default btn-sm">&nbsp;
+                        <i class="fa fa-arrow-left"></i>&nbsp;
+                        Detalle usuario
+                    </a>
+                {% endif %}
+                {% if is_granted('ROLE_USER_LIST') %}
+                    <a class="btn btn-default btn-sm" href="{{ path('usuarios_index') }}">
+                        Listado de Usuarios
+                    </a>
+                {% endif %}
+                {% if is_granted('ROLE_ACTIVAR_DESACTIVAR_USUARIO') %}
+                    <button type="button" id="btnModalEliminarUser" class="btn btn-sm btn-default">
+                        <i class="fa fa-close text-red"></i> Desactivar
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            {{ form_start(form) }}
+            <div class="box">
+                <div class="box-header with-border">
+                    Datos del usuario
+                </div>
+                {{ include('security/user.datos.html.twig') }}
+                <div class="box-footer text-right">
+                    <button class="btn btn-sm btn-primary" type="submit">
+                        <i class="fa fa-save fa-fw"></i>
+                        Registrar
+                    </button>
+                </div>
+            </div>
+            {{ form_end(form) }}
+
+            {% for flashMessage in app.session.flashbag.get('success') %}
+                <div class="flash-notice">
+                    <div class="box box-info box-solid">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Mensaje</h3>
+                            <div class="box-tools pull-right">
+                                <button class="btn btn-box-tool" data-widget="remove">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            {{ flashMessage }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% if is_granted('ROLE_SECCION_SECURITY_QUESTIONS_PERFIL_USUARIO') %}
+            <div class="col-md-7">
+                <div class="box">
+                    <div class="box-header with-border">
+                        Preguntas de seguridad
+                        <div class="box-tools">
+                            {% if is_granted('ROLE_ANSWER_SECURITY_QUESTIONS_PERFIL_USUARIO') %}
+                                <button class="btn btn-sm btn-default" type="button" id="btn-preguntas-seguridad">
+                                    <i class="fa fa-plus fa-fw text-green"></i>
+                                    Agregar
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <table class="table">
+                            {% for question in userQuestions %}
+                                <tr>
+                                    <th style="width: 40%">¿ {{ question.question }} ?</th>
+                                    <td>{% for i in range(1, question.answer|length) %}•{% endfor %}</td>
+                                    {% if is_granted('ROLE_ELIMINAR_PREGUNTAS_SEGURIDAD_PERFIL_USUARIO') %}
+                                    <td>
+                                        <a href="{{ path('user_eliminar_pregunta', {id:user.id, nameQuestion:question.question}) }}"
+                                           class="btn btn-default pull-right btn-sm">
+                                            <i class="fa fa-close text-red"></i>
+                                            Eliminar</a>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% include 'security/user.modal.eliminar.html.twig' %}
+    {% include 'security/modal.user.preguntas.seguridad.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        var $idUser = '{{ user.id }}';
+        let $btnPreguntasSeguridad = $('#btn-preguntas-seguridad')
+        let $btnGuardarRespuesta = $('#guardarPreguntas')
+        let $btnCancelPreguntaSeguridad = $('#btnCancelPreguntaSeguridad')
+        let $selectQuestion = $('#selectQuestion')
+        let $inputAnswer = $('#userAnswer')
+        let formPreguntas = document.getElementById('formPreguntas');
+
+        $('#labelEliminar').html('¿Esta seguro de desactivar el usuario?');
+
+        $('#btnModalEliminarUser').on('click', function () {
+            $('#mdlEliminarUser').modal('show');
+        });
+
+        $('#btnEliminar').on('click', function () {
+            var url = Routing.generate('usuario_eliminar', {id: $idUser});
+
+            $('#btnEliminar').attr('disabled', true);
+            $('#labelEliminar').html('Desactivando usuario, por favor espere ...')
+            location.href = url;
+        })
+        $selectQuestion.change(function () {
+            $inputAnswer.focus()
+        })
+
+        $btnPreguntasSeguridad.on('click', function () {
+            $('#modalPreguntasSeguridad').modal('show')
+        });
+
+        formPreguntas.addEventListener('submit', function () {
+            $btnGuardarRespuesta.attr('disabled', true);
+            $btnCancelPreguntaSeguridad.attr('disabled', true);
+        });
+    </script>
+{% endblock %}

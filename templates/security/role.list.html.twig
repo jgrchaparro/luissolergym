@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}
+    Permisos
+{% endblock %}
+
+{% block body %}
+    <div class="box">
+        <div class="box-header with-border">
+            <i class="fa fa-users fa-fw"></i>
+            Permisos
+            <div class="box-tools">
+                <a class="btn btn-default btn-sm" href="{{ path('settings_index') }}">
+                    <i class="fa fa-arrow-left"></i>&nbsp;
+                    Configuraciones
+                </a>
+                {% if is_granted('ROLE_ADD_ROLE') %}
+                    <a class="btn btn-default btn-sm" href="{{ path('role_add') }}">
+                        <i class="fa fa-plus"></i>&nbsp;
+                        Crear Permiso
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+    <div class="box">
+        <div class="box-body">
+            <table class="table table-hover table-striped table-condensed" id="tableRoles">
+                <thead>
+                <tr>
+                    <th>Permiso</th>
+                    <th>Descripci&oacute;n</th>
+                    <th class="text-right"><i class="fa fa-cogs fa-fw"></i>Acciones</th>
+                </tr>
+                </thead>
+                {% for role in roles %}
+                    <tr>
+                        <td>{{ role.role }}</td>
+                        <td>{{ role.descripcion }}</td>
+                        <td class="text-right">
+                            {% if is_granted('ROLE_DETAILS_ROLE') %}
+                                <a class="btn btn-default btn-sm" href="{{ path('role_detail', { 'id' : role.id }) }}">
+                                    <i class="fa fa-cog fa-fw"></i>Detalle
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <script>
+        $(function () {
+            $('#tableRoles').DataTable({
+                "oLanguage": {
+                    "sProcessing": '<div class="text-center" style="font-size: 16px">Cargando, favor espere ... </div>' + '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',
+                    "sInfo": "Un total de _TOTAL_ registros para mostrar (_START_ a _END_)",
+                    "sLengthMenu": "Mostrando _MENU_ registros",
+                    "oPaginate": {
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "sEmptyTable": "No se encontraron registros",
+                    "sInfoEmpty": "_TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+        });
+    </script>
+{% endblock %}

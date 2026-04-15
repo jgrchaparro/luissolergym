@@ -1,0 +1,53 @@
+<header class="main-header">
+    <a href="{{ path('dashboard') }}" class="logo">
+        <span class="logo-mini padding-top-logo"><img src="{{ asset('img/luissolergym-logo-login.png') }}" width="80%"></span>
+        <span class="logo-lg padding-top-logo"><img src="{{ asset('img/luissolergym-logo-login.png') }}"
+                                                    width="100%"></span>
+    </a>
+
+    <nav class="navbar navbar-static-top" role="navigation">
+        <a href="#" class="sidebar-toggle nav-center" data-toggle="offcanvas" role="button" style="font-size: 25px;">
+            <span class="sr-only">Ocultar navegacion</span>
+        </a>
+
+        {# <nav class="main-header navbar  navbar-white navbar-light"> #}
+        <!-- Left navbar links -->
+        <div class="navbar-custom-menu item-height">
+            <ul class="nav navbar-nav item-height">
+                <li class="dropdown user user-menu item-height">
+                    <a href="#" class="dropdown-toggle nav-center" data-toggle="dropdown">
+                        <!-- The user image in the navbar-->
+                        <img src="{{ asset('img/avatar.png') }}" class="user-image" alt="User Image"/>
+                        <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                        <span class="hidden-xs">{{ app.user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <!-- The user image in the menu -->
+                        <li class="user-header">
+                            <img src="{{ asset('img/avatar.png') }}" class="img-circle" alt="User Image"/>
+                            <p>
+                                {{ app.user.username }}
+                            </p>
+                        </li>
+                        <li class="user-footer">
+                            {% if is_granted('ROLE_PERFIL_EDIT') %}
+                                <div class="pull-left">
+                                    <a href="{{ path('usuario_perfil_editar') }}"
+                                       class="btn btn-primary btn-flat">
+                                        Perfil
+                                    </a>
+                                </div>
+                            {% endif %}
+                            <div class="pull-right">
+                                <a href="{{ path('nucleos_user_security_logout') }}"
+                                   class="btn btn-primary btn-flat">
+                                    Salir
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>

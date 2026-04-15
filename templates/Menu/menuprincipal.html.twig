@@ -1,0 +1,17 @@
+<style>
+    .sidebar-menu li a span {
+        padding-left: 8px !important;
+        font-size: 13px;
+    }
+</style>
+<ul class="sidebar-menu">
+    <li class="header">M&oacute;dulos</li>
+    <li><a href="{{ path('dashboard') }}"><i class="fa fa-fw fa-home"></i><span>Dashboard</span></a></li>
+    <li><a href="{{ path('cliente_list') }}"><i class="fa fa-fw fa-user"></i><span>Miembros</span></a></li>
+    <li><a href="{{ path('tipo_mensualidad_list') }}"><i class="fa fa-fw fa-list-alt"></i><span>Tipos de Mensualidad</span></a></li>
+    <li><a href="{{ path('tipo_pago_list') }}"><i class="fa fa-fw fa-credit-card"></i><span>Tipos de Pago</span></a></li>
+    <li><a href="{{ path('tasas_list') }}"><i class="fa fa-fw fa-exchange"></i><span>Tasas</span></a></li>
+{#    {% if is_granted('ROLE_VER_BOTON_CONFIGURACIONES_MENU_PRINCIPAL') %}#}
+        <li><a href="{{ path('settings_index') }}"><i class="fa fa-cogs fa-fw"></i> <span>Configuraciones</span></a></li>
+{#    {% endif %}#}
+</ul>

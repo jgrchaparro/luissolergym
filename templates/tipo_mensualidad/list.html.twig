@@ -1,0 +1,215 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}Tipos de Mensualidad{% endblock %}
+
+{% block body %}
+    <div ng-app="ngMainApp" ng-controller="ngTipoMensualidadController as $ctrl">
+
+        {# ===== HEADER ===== #}
+        <div class="box">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt fa-fw"></i> Tipos de Mensualidad
+                <div class="box-tools">
+                    <button class="btn btn-default btn-sm" ng-click="$ctrl.abrirModalAgregar()">
+                        <i class="fa fa-plus"></i>&nbsp; Agregar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {# ===== FILTROS + TABLA ===== #}
+        <div class="row">
+            <div class="col-md-3">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <i class="fa fa-filter fa-fw"></i> Filtros
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label>Buscar por c&oacute;digo o descripci&oacute;n</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" ng-model="$ctrl.busqueda"
+                                       ng-keypress="$event.keyCode === 13 && $ctrl.buscar()"
+                                       placeholder="Ingrese b&uacute;squeda...">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-flat" ng-click="$ctrl.buscar()">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <button class="btn btn-default btn-flat btn-block" ng-click="$ctrl.limpiarFiltro()">
+                            <i class="fa fa-eraser"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="box">
+                    <div class="box-body">
+                        <div class="text-center" ng-show="$ctrl.loading">
+                            <i class="fa fa-spinner fa-spin fa-2x"></i>
+                        </div>
+                        <table class="table table-hover" ng-hide="$ctrl.loading">
+                            <thead>
+                            <tr>
+                                <th>C&oacute;digo</th>
+                                <th>Descripci&oacute;n</th>
+                                <th class="text-right">Monto (USD)</th>
+                                <th>Fecha Creaci&oacute;n</th>
+                                <th class="text-right"><i class="fa fa-cogs fa-fw"></i> Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="item in $ctrl.items">
+                                <td ng-bind="item.codigo"></td>
+                                <td ng-bind="item.descripcion"></td>
+                                <td class="text-right">{% verbatim %}{{ item.monto | number:2 }}{% endverbatim %}</td>
+                                <td ng-bind="item.fechaCreacion"></td>
+                                <td class="text-right">
+                                    <button class="btn btn-default btn-sm" ng-click="$ctrl.abrirModalEditar(item.id)">
+                                        <i class="fa fa-pencil fa-fw"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" ng-click="$ctrl.confirmarEliminar(item)">
+                                        <i class="fa fa-trash fa-fw"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center" ng-hide="$ctrl.loading || $ctrl.items.length > 0">
+                            <p class="text-muted">No se encontraron tipos de mensualidad.</p>
+                        </div>
+                    </div>
+                    <div class="box-footer clearfix" ng-hide="$ctrl.loading">
+                        <div class="pull-left" style="line-height: 34px;">
+                            Mostrando {% verbatim %}{{ $ctrl.items.length }}{% endverbatim %} de {% verbatim %}{{ $ctrl.total }}{% endverbatim %} registros
+                        </div>
+                        <ul class="pagination pagination-sm no-margin pull-right">
+                            <li ng-class="{disabled: $ctrl.paginaActual <= 1}">
+                                <a href ng-click="$ctrl.irPagina($ctrl.paginaActual - 1)"><i class="fa fa-chevron-left"></i></a>
+                            </li>
+                            <li ng-repeat="p in $ctrl.paginas" ng-class="{active: p === $ctrl.paginaActual}">
+                                <a href ng-click="$ctrl.irPagina(p)" ng-bind="p"></a>
+                            </li>
+                            <li ng-class="{disabled: $ctrl.paginaActual >= $ctrl.totalPaginas}">
+                                <a href ng-click="$ctrl.irPagina($ctrl.paginaActual + 1)"><i class="fa fa-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ===== MODAL AGREGAR / EDITAR ===== #}
+        <div class="modal" id="modalTipoMensualidad" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="box-title">
+                            <i class="fa fa-list-alt fa-fw"></i>
+                            <span ng-hide="$ctrl.isEdit">Nuevo Tipo de Mensualidad</span>
+                            <span ng-show="$ctrl.isEdit">Editar Tipo de Mensualidad</span>
+                        </h4>
+                    </div>
+                    <form name="tipoForm" ng-submit="$ctrl.guardar()">
+                        <div class="modal-body">
+                            <div class="alert alert-danger" ng-show="$ctrl.error">
+                                <i class="fa fa-ban"></i> {% verbatim %}{{ $ctrl.error }}{% endverbatim %}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>C&oacute;digo</label>
+                                        <input type="text" class="form-control" ng-model="$ctrl.formData.codigo"
+                                               placeholder="Ej: FULL-001" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Monto (USD)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                            <input type="number" step="0.01" min="0" class="form-control"
+                                                   ng-model="$ctrl.formData.monto" placeholder="0.00" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tipo de Mensualidad</label>
+                                        <div class="well well-sm" style="margin-bottom: 0; max-height: 200px; overflow-y: auto;">
+                                            <div class="checkbox" ng-repeat="opcion in $ctrl.opcionesDescripcion" style="margin: 4px 0;">
+                                                <label>
+                                                    <input type="checkbox" ng-model="$ctrl.checksSeleccionados[opcion]">
+                                                    {% verbatim %}{{ opcion }}{% endverbatim %}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-flat btn-primary">
+                                <i class="fa fa-save"></i>
+                                <span ng-hide="$ctrl.isEdit">Registrar</span>
+                                <span ng-show="$ctrl.isEdit">Actualizar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# ===== MODAL ELIMINAR ===== #}
+        <div class="modal" id="modalEliminarTipo" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="box-title"><i class="fa fa-exclamation-triangle"></i> Confirmaci&oacute;n</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p style="font-size: 16px;">&iquest;Est&aacute; seguro de eliminar este tipo de mensualidad?</p>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 120px;">C&oacute;digo</th>
+                                <td ng-bind="$ctrl.itemEliminar.codigo"></td>
+                            </tr>
+                            <tr>
+                                <th>Descripci&oacute;n</th>
+                                <td ng-bind="$ctrl.itemEliminar.descripcion"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-flat btn-danger" ng-click="$ctrl.eliminar()">
+                            <i class="fa fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/toast.js') }}"></script>
+    <script src="{{ asset('js/appInit.js') }}"></script>
+    <script src="{{ asset('js/angular/tipo-mensualidad-controller.js') }}"></script>
+{% endblock %}

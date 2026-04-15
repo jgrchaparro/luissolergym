@@ -1,0 +1,62 @@
+{% extends 'Default/layout.recuperacion.password.html.twig' %}
+
+{% block nucleos_user_content %}
+    <div class="login-box" style="width: 40%; margin-top: 50px;border-bottom: none">
+        {{ parent() }}
+        <div class="box" style="border: none">
+            <div class="box-header">
+                Preguntas de Seguridad
+            </div>
+            <div class="box-body">
+                {% for key,pregunta in preguntasRepuestas %}
+                    <label for="input-{{ key }}"> ¿ {{ pregunta.question }} ? </label>
+                    <br>
+                    <input class="form-control" type="password" id="input-{{ key }}" required>
+                    <br>
+                {% endfor %}
+            </div>
+            <div class="box-footer" style="border:none">
+                <a href="{{ path('nucleos_user_security_login') }}" class="btn btn-primary  btn-flat">
+                    Login
+                </a>
+                <button class="btn btn-primary pull-right" id="validarRespuestas">Enviar</button>
+            </div>
+        </div>
+    </div>
+{% endblock nucleos_user_content %}
+{% block javascripts %}
+    <script>
+        let $btnValidar = $('#validarRespuestas')
+        let $username = '{{ username }}'
+        let data = {
+            respuesta: {}
+        };
+        data.username = $username
+        let input0 = document.getElementById('input-0');
+        let numeroPreguntas = '{{ numeroPreguntas }}';
+        document.addEventListener('DOMContentLoaded', function () {
+            input0.focus();
+        });
+        $btnValidar.on('click', function () {
+            $btnValidar.attr('disabled', true)
+            for (let $i = 0; $i < numeroPreguntas; $i++) {
+                let input = document.getElementById("input-" + $i);
+                data.respuesta[$i] = input.value.trim();
+            }
+
+            let url = "{{ path('user_validacion_respuestas') }}";
+            url += '?' + $.param(data);
+
+            $.getJSON(url, function (data) {
+                let $token = data['token'];
+                if (!data['response']) {
+                    location.href = "{{ path('user_fail_validacion_respuestas', {username:username}) }}"
+                } else if (data['response'] === true) {
+                   let url = "{{ path('user_success_validacion_respuestas', { username : username, token : '__TOKEN__' }) }}";
+                   url = url.replace('__TOKEN__', $token);
+                   location.href =url;
+                }
+            });
+        });
+    </script>
+{% endblock %}

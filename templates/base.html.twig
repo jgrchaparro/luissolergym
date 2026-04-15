@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <title>{% block title %}{% endblock %}</title>
+
+    {% block stylesheets %}{% endblock %}
+
+    <link rel="stylesheet" href="{{ asset('css/styles.gulp.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/movilnet.css') }}"/>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/luissolergym-logo-login.png') }}"/>
+
+</head>
+<body class="skin-blue-light sidebar-mini sidebar-collapse">
+
+<div class="wrapper">
+    {{ include('Default/main-header.html.twig') }}
+
+    <aside class="main-sidebar">
+        <section class="sidebar">
+            {% block menu_principal %}{% endblock %}
+        </section>
+    </aside>
+
+    <div class="content-wrapper" style="min-height: 976px;">
+        <section class="content-header">
+            {% block content_header %}{% endblock %}
+        </section>
+        <section class="content no-pad-top">
+            {% block body_wrapper %}
+                <div id="body-content-wrapper" style="position: relative; min-height: 400px;">
+                    {% block body_loader %}{% endblock %}
+                    {% block body %}{% endblock %}
+                </div>
+            {% endblock %}
+        </section>
+    </div>
+
+    <!-- Main Footer -->
+    <footer class="main-footer">
+        <div class="pull-right hidden-xs">
+            <b>Version</b> 1.0a
+        </div>
+        <strong>Copyright© 2020</strong> Todos los derechos reservados.
+
+    </footer>
+</div>
+<div>
+    {% block nucleos_user_content %}
+    {% endblock nucleos_user_content %}
+</div>
+
+<script src="{{ asset('js/javascript.gulp.js') }}"></script>
+<script src="{{ asset('js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {'callback': 'fos.Router.setData'}) }}"></script>
+
+<script>
+    var datePickerOptions = {
+        startDate: moment(),
+        endDate: moment(),
+
+        ranges: {
+            'Hoy': [moment(), moment()],
+            'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Últimos 7 dias': [moment().subtract(6, 'days'), moment()],
+            'Últimos 30 dias': [moment().subtract(29, 'days'), moment()],
+            'Este mes': [moment().startOf('month'), moment().endOf('month')],
+            'Último mes': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        locale: {
+            "applyLabel": "Aplicar",
+            "cancelLabel": "Cancelar",
+            'customRangeLabel': 'Rango Perzonalizado',
+            "daysOfWeek": [
+                "Dm",
+                "Lu",
+                "Ma",
+                "Mi",
+                "Ju",
+                "Vi",
+                "Sa"
+            ],
+            "monthNames": [
+                "Enero",
+                "Febrero",
+                "Marzo",
+                "Abril",
+                "Mayo",
+                "Junio",
+                "Julio",
+                "Agosto",
+                "Septiembre",
+                "Octubre",
+                "Noviembre",
+                "Diciembre"
+            ],
+            "firstDay": 1
+        }
+    };
+
+    $(function () {
+        const monthNames = [
+            "Enero",
+            "Febrero",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre"
+        ];
+        const daysOfWeek = [
+            "Dm",
+            "Lu",
+            "Ma",
+            "Mi",
+            "Ju",
+            "Vi",
+            "Sa"
+        ];
+
+        moment.locale('es', {
+            months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
+
+        });
+
+        $('.single-datepicker').daterangepicker({
+            format: 'MM/DD/YYYY',
+            singleDatePicker: true,
+            showDropdowns: true,
+            locale: {
+                "applyLabel": "Aplicar",
+                "cancelLabel": "Cancelar",
+                "daysOfWeek": daysOfWeek,
+                "monthNames": monthNames
+            }
+        });
+
+        $(".datepicker").daterangepicker(
+            {
+                format: 'MM/DD/YYYY',
+                showDropdowns: true,
+                startDate: moment(),
+                singleDatePicker: true,
+                locale: {
+                    "applyLabel": "Aplicar",
+                    "cancelLabel": "Cancelar",
+                    "daysOfWeek": daysOfWeek,
+                    "monthNames": monthNames
+                }
+            }
+        );
+    });
+
+    var singleDatepickerOptions = {
+        autoApply: true,
+        singleDatePicker: true,
+        locale: {
+            format: 'DD-MMMM-YYYY',
+            daysOfWeek: [
+                "Dm",
+                "Lu",
+                "Ma",
+                "Mi",
+                "Ju",
+                "Vi",
+                "Sa"
+            ],
+            monthNames: [
+                "Enero",
+                "Febrero",
+                "Marzo",
+                "Abril",
+                "Mayo",
+                "Junio",
+                "Julio",
+                "Agosto",
+                "Septiembre",
+                "Octubre",
+                "Noviembre",
+                "Diciembre"
+            ],
+        }
+    };
+
+    $(function () {
+        $('.datepicker-single').daterangepicker({
+            maxdDate: moment(),
+            format: 'MM-DD-YY',
+            singleDatePicker: true,
+            showDropdowns: true
+        });
+    });
+
+</script>
+{% block javascripts %}{% endblock %}
+
+</body>
+
+</html>
