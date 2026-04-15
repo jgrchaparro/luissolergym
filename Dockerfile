@@ -20,12 +20,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libssl-dev \
         libxml2-dev \
         libonig-dev \
+        libpng-dev \
+        libjpeg-dev \
+        libfreetype6-dev \
+        libwebp-dev \
         pkg-config \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # ---- Extensiones PHP ------------------------------------------------------
-RUN docker-php-ext-install -j"$(nproc)" \
+# gd requiere configurarse con las libs de imagen antes de instalarse
+# (lo necesita gregwar/captcha-bundle para generar los captchas).
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j"$(nproc)" \
+        gd \
         intl \
         opcache \
         zip \
