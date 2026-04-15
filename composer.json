@@ -8,20 +8,16 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-mongodb": "^2.0",
-        "captcha-com/symfony-captcha-bundle": "^4.2",
         "doctrine/mongodb-odm-bundle": "^5.5",
         "friendsofsymfony/jsrouting-bundle": "^3.6",
         "gregwar/captcha-bundle": "^2.4",
         "nucleos/user-bundle": "^4.0",
-        "phpseclib/phpseclib": "^3.0",
         "symfony/apache-pack": "*",
         "symfony/asset": "7.3.*",
         "symfony/console": "7.3.*",
         "symfony/dotenv": "7.3.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.3.*",
-        "symfony/lock": "7.3.*",
-        "symfony/maker-bundle": "^1.64",
         "symfony/monolog-bundle": "^3.10",
         "symfony/runtime": "7.3.*",
         "symfony/security-bundle": "7.3.*",
@@ -82,6 +78,7 @@
         }
     },
     "require-dev": {
+        "symfony/maker-bundle": "^1.64",
         "symfony/web-profiler-bundle": "7.3.*"
     }
 }
