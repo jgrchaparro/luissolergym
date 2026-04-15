@@ -76,8 +76,28 @@ RUN composer update \
 COPY . .
 
 # Autoload optimizado + scripts de post-install (incluye patch-nucleos-user.php)
-RUN composer dump-autoload --classmap-authoritative --no-dev \
-    && composer run-script post-install-cmd --no-dev
+# cache:clear necesita resolver las env vars al compilar el contenedor; en
+# Render los valores reales se inyectan en runtime (entrypoint vuelve a
+# correr cache:clear con ellas), así que aquí pasamos dummies solo para que
+# el build pueda terminar.
+RUN MONGODB_URL=mongodb://localhost:27017 \
+    MONGODB_DB=build \
+    APP_SECRET=build_dummy_secret \
+    MAILER_DSN=null://null \
+    MAIL_SENDER=build@localhost \
+    DEFAULT_URI=http://localhost \
+    MOSTRAR_CAPTCHA=0 \
+    MOSTRAR_NOTIFICACION_PREGUNTAS_SEGURIDAD=0 \
+    composer dump-autoload --classmap-authoritative --no-dev \
+    && MONGODB_URL=mongodb://localhost:27017 \
+       MONGODB_DB=build \
+       APP_SECRET=build_dummy_secret \
+       MAILER_DSN=null://null \
+       MAIL_SENDER=build@localhost \
+       DEFAULT_URI=http://localhost \
+       MOSTRAR_CAPTCHA=0 \
+       MOSTRAR_NOTIFICACION_PREGUNTAS_SEGURIDAD=0 \
+       composer run-script post-install-cmd --no-dev
 
 # ---- Permisos y carpetas de caché ----------------------------------------
 RUN mkdir -p var/cache var/log \
