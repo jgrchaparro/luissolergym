@@ -1,25 +1,23 @@
 {% extends 'Default/layout.recuperacion.password.html.twig' %}
 
 {% block nucleos_user_content %}
-    <div class="login-box" style="width: 40%; margin-top: 50px;border-bottom: none">
+    <div class="login-box" style="max-width: 440px;">
         {{ parent() }}
-        <div class="box" style="border: none">
+        <div class="login-box-body">
             <div class="box-header">
                 Preguntas de Seguridad
             </div>
-            <div class="box-body">
-                {% for key,pregunta in preguntasRepuestas %}
-                    <label for="input-{{ key }}"> ¿ {{ pregunta.question }} ? </label>
-                    <br>
+            {% for key,pregunta in preguntasRepuestas %}
+                <div class="form-group">
+                    <label for="input-{{ key }}">¿ {{ pregunta.question }} ?</label>
                     <input class="form-control" type="password" id="input-{{ key }}" required>
-                    <br>
-                {% endfor %}
-            </div>
-            <div class="box-footer" style="border:none">
-                <a href="{{ path('nucleos_user_security_login') }}" class="btn btn-primary  btn-flat">
+                </div>
+            {% endfor %}
+            <div style="padding: 10px 0;">
+                <a href="{{ path('nucleos_user_security_login') }}" class="btn btn-primary btn-flat">
                     Login
                 </a>
-                <button class="btn btn-primary pull-right" id="validarRespuestas">Enviar</button>
+                <button class="btn btn-primary btn-flat pull-right" id="validarRespuestas">Enviar</button>
             </div>
         </div>
     </div>

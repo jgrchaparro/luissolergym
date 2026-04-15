@@ -4,11 +4,11 @@
     <meta charset="UTF-8"/>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <title>{% block title %}Login! {% endblock %}</title>
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/logo-login.png') }}"/>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/luissolergym-logo-login.png') }}"/>
 
     {% block stylesheets %}
         <link rel="stylesheet" href=" {{ asset('css/styles.css') }} "/>
-        <link rel="stylesheet" href=" {{ asset('css/movilnet.css') }} "/>
+        <link rel="stylesheet" href=" {{ asset('css/app.css') }} "/>
         <style>
             html, body {
                 height: 100%;
@@ -114,7 +114,7 @@
                 background: transparent;
                 text-decoration: underline;
             }
-            body.signin-body .alert-warning.bg-movilnet {
+            body.signin-body .alert-warning.bg-primary-dark {
                 border-radius: 10px;
                 border: 0;
                 color: #fff;
@@ -164,13 +164,13 @@
             </form>
             {% for type, flashes in app.flashes %}
                 {% for flash in flashes %}
-                    <div class="alert alert-warning bg-movilnet" style="margin-top: 10px">
+                    <div class="alert alert-warning bg-primary-dark" style="margin-top: 10px">
                         {{ flash }}
                     </div>
                 {% endfor %}
             {% endfor %}
             {% if error %}
-                <div class="alert alert-warning bg-movilnet"
+                <div class="alert alert-warning bg-primary-dark"
                      style="margin-top: 20px;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
             {% endif %}
         </div>
