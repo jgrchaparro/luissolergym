@@ -53,8 +53,11 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock symfony.lock ./
 COPY scripts ./scripts
 
-# Instala dependencias sin ejecutar scripts (aún no tenemos src/)
-RUN composer install \
+# Instala dependencias sin ejecutar scripts (aún no tenemos src/).
+# Usamos `update` en vez de `install` para que regenere composer.lock
+# dentro del contenedor (PHP 8.2), ya que el lock del repo puede estar
+# desfasado con composer.json.
+RUN composer update \
         --no-dev \
         --no-scripts \
         --no-autoloader \
