@@ -20,13 +20,22 @@ sed -ri "s!^Listen .*!Listen ${PORT}!g" /etc/apache2/ports.conf
 sed -ri "s!<VirtualHost \\*:[0-9]+>!<VirtualHost *:${PORT}>!g" \
     /etc/apache2/sites-available/000-default.conf
 
-# Carpetas volátiles (por si un volumen las vació)
-mkdir -p var/cache var/log
-chown -R www-data:www-data var
+# Carpetas volátiles (por si un volumen las vació).
+# Incluye los subdirectorios que Doctrine MongoDB ODM escribe a demanda
+# (auto_generate_hydrator_classes/proxy_classes = true) durante los requests.
+mkdir -p var/cache var/log \
+    var/cache/prod/doctrine/odm/mongodb/Hydrators \
+    var/cache/prod/doctrine/odm/mongodb/Proxies \
+    var/cache/prod/doctrine/odm/mongodb/PersistentCollections
 
-# Cache de Symfony en prod
+# Cache de Symfony en prod (corre como root, por eso el chown va DESPUÉS).
 php bin/console cache:clear   --env=prod --no-debug || true
 php bin/console cache:warmup  --env=prod --no-debug || true
+
+# Apache corre como www-data, así que debe poder escribir en var/
+# (Doctrine genera hydrators en runtime cuando ve un documento nuevo).
+chown -R www-data:www-data var
+chmod -R u+rwX var
 
 echo "[entrypoint] Apache listening on port ${PORT} (APP_ENV=${APP_ENV})"
 
