@@ -6,6 +6,13 @@
 
 set -e
 
+# Forzamos APP_ENV=prod en runtime. Esto blinda contra:
+#   - un APP_ENV=dev heredado del .env del repo
+#   - un APP_ENV=dev que alguien haya dejado en el dashboard de Render
+# Apache (lanzado con exec más abajo) hereda este export.
+export APP_ENV=prod
+export APP_DEBUG=0
+
 PORT="${PORT:-10000}"
 
 # Reescribe Listen en ports.conf y el VirtualHost

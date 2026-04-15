@@ -12,9 +12,8 @@ var/log/*
 !var/cache/.gitkeep
 !var/log/.gitkeep
 
-# Archivos de entorno locales — nunca van a la imagen de prod
-.env.local
-.env.*.local
+# Archivos de entorno de dev/test — nunca van a la imagen de prod.
+# Solo .env (base) y .env.prod quedan dentro de la imagen.
 .env.dev
 .env.test
 
