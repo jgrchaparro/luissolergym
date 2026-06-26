@@ -71,7 +71,7 @@ RUN composer update \
         --no-autoloader \
         --prefer-dist \
         --no-progress \
-        --no-audit
+        --ignore-platform-reqs
 
 # Ahora sí copiamos el resto del proyecto
 COPY . .
