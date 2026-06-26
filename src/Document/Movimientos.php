@@ -22,6 +22,14 @@ class Movimientos
     protected ?TipoPago $tipo_pago = null;
     #[MongoDB\Field(type: 'string')]
     protected ?string $observaciones = null;
+    #[MongoDB\Field(type: 'string')]
+    protected ?string $moneda = 'USD';
+    #[MongoDB\Field(type: 'date')]
+    protected ?\DateTime $fechaVencimiento = null;
+    #[MongoDB\Field(type: 'float')]
+    protected ?float $montoUsdRef = null;
+    #[MongoDB\Field(type: 'string')]
+    protected ?string $clienteOcasional = null;
 
 
     public function __construct()
@@ -92,5 +100,45 @@ class Movimientos
     public function setObservaciones(?string $observaciones): void
     {
         $this->observaciones = $observaciones;
+    }
+
+    public function getMoneda(): ?string
+    {
+        return $this->moneda ?: 'USD';
+    }
+
+    public function setMoneda(?string $moneda): void
+    {
+        $this->moneda = $moneda ?: 'USD';
+    }
+
+    public function getFechaVencimiento(): ?\DateTime
+    {
+        return $this->fechaVencimiento;
+    }
+
+    public function setFechaVencimiento(?\DateTime $fechaVencimiento): void
+    {
+        $this->fechaVencimiento = $fechaVencimiento;
+    }
+
+    public function getMontoUsdRef(): ?float
+    {
+        return $this->montoUsdRef;
+    }
+
+    public function setMontoUsdRef(?float $montoUsdRef): void
+    {
+        $this->montoUsdRef = $montoUsdRef;
+    }
+
+    public function getClienteOcasional(): ?string
+    {
+        return $this->clienteOcasional;
+    }
+
+    public function setClienteOcasional(?string $clienteOcasional): void
+    {
+        $this->clienteOcasional = $clienteOcasional;
     }
 }

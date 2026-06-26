@@ -51,7 +51,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
             $this->userService->resetLoginFail($data['_username']);
 
 
-            return new RedirectResponse($this->urlGenerator->generate('homepage'));
+            return new RedirectResponse($this->urlGenerator->generate('pago_list'));
         }
     }
 }

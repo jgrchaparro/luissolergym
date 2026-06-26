@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}Vencidos{% endblock %}
+
+{% block body %}
+    <div ng-app="ngMainApp" ng-controller="ngVencidosController as $ctrl">
+
+        {# ===== HEADER ===== #}
+        <div class="box">
+            <div class="box-header with-border">
+                <i class="fa fa-exclamation-triangle fa-fw text-red"></i> Miembros Vencidos
+            </div>
+        </div>
+
+        {# ===== FILTROS + TABLA ===== #}
+        <div class="row">
+            <div class="col-md-3">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <i class="fa fa-filter fa-fw"></i> Filtros
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label>Buscar por c&eacute;dula, nombre o apellido</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" ng-model="$ctrl.busqueda"
+                                       ng-keypress="$event.keyCode === 13 && $ctrl.buscar()"
+                                       placeholder="Ingrese b&uacute;squeda...">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-flat" ng-click="$ctrl.buscar()">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <button class="btn btn-default btn-flat btn-block" ng-click="$ctrl.limpiarFiltro()">
+                            <i class="fa fa-eraser"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="box">
+                    <div class="box-body">
+                        <div class="text-center" ng-show="$ctrl.loading">
+                            <i class="fa fa-spinner fa-spin fa-2x"></i>
+                        </div>
+                        <div class="table-responsive" ng-hide="$ctrl.loading" style="overflow-x: auto;">
+                        <table class="table table-hover table-condensed">
+                            <thead>
+                            <tr>
+                                <th>C&eacute;dula</th>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Tel&eacute;fono</th>
+                                <th>Tipo Mensualidad</th>
+                                <th>Venci&oacute;</th>
+                                <th class="text-right"><i class="fa fa-cogs fa-fw"></i> Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="cliente in $ctrl.clientes">
+                                <td ng-bind="cliente.cedula"></td>
+                                <td ng-bind="cliente.nombres"></td>
+                                <td ng-bind="cliente.apellidos"></td>
+                                <td ng-bind="cliente.telefono"></td>
+                                <td><span class="label label-info" ng-if="cliente.tipoMensualidadCodigo" ng-bind="cliente.tipoMensualidadCodigo"></span></td>
+                                <td>
+                                    <span ng-if="cliente.fechaVencimiento" ng-bind="cliente.fechaVencimiento"></span>
+                                    <span class="label label-default" ng-if="cliente.sinPagos">Sin pagos</span>
+                                    <span class="label label-danger" ng-if="cliente.diasVencido != null">
+                                        {% verbatim %}{{ cliente.diasVencido }}{% endverbatim %} d&iacute;a(s)
+                                    </span>
+                                </td>
+                                <td class="text-right">
+                                    <button class="btn btn-default btn-sm" ng-click="$ctrl.verDetalle(cliente.id)">
+                                        <i class="fa fa-eye fa-fw"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                        <div class="text-center" ng-hide="$ctrl.loading || $ctrl.clientes.length > 0">
+                            <p class="text-muted">No hay miembros vencidos.</p>
+                        </div>
+                    </div>
+                    <div class="box-footer clearfix" ng-hide="$ctrl.loading">
+                        <div class="pull-left" style="line-height: 34px;">
+                            Mostrando {% verbatim %}{{ $ctrl.clientes.length }}{% endverbatim %} de {% verbatim %}{{ $ctrl.total }}{% endverbatim %} vencidos
+                        </div>
+                        <ul class="pagination pagination-sm no-margin pull-right">
+                            <li ng-class="{disabled: $ctrl.paginaActual <= 1}">
+                                <a href ng-click="$ctrl.irPagina($ctrl.paginaActual - 1)"><i class="fa fa-chevron-left"></i></a>
+                            </li>
+                            <li ng-repeat="p in $ctrl.paginas" ng-class="{active: p === $ctrl.paginaActual}">
+                                <a href ng-click="$ctrl.irPagina(p)" ng-bind="p"></a>
+                            </li>
+                            <li ng-class="{disabled: $ctrl.paginaActual >= $ctrl.totalPaginas}">
+                                <a href ng-click="$ctrl.irPagina($ctrl.paginaActual + 1)"><i class="fa fa-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/toast.js') }}"></script>
+    <script src="{{ asset('js/appInit.js') }}"></script>
+    <script src="{{ asset('js/angular/vencidos-controller.js') }}"></script>
+{% endblock %}

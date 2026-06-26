@@ -28,6 +28,8 @@ class Cliente
     protected bool $solvente = false;
     #[MongoDB\Field(type: 'date')]
     protected ?\DateTime $fecha_corte = null;
+    #[MongoDB\Field(type: 'date')]
+    protected ?\DateTime $fecha_vencimiento = null;
     #[MongoDB\ReferenceOne(targetDocument: TipoMensualidad::class)]
     protected ?TipoMensualidad $tipo_mensualidad = null;
     public function __construct()
@@ -134,6 +136,16 @@ class Cliente
     public function setFechaCorte(?\DateTime $fecha_corte): void
     {
         $this->fecha_corte = $fecha_corte;
+    }
+
+    public function getFechaVencimiento(): ?\DateTime
+    {
+        return $this->fecha_vencimiento;
+    }
+
+    public function setFechaVencimiento(?\DateTime $fecha_vencimiento): void
+    {
+        $this->fecha_vencimiento = $fecha_vencimiento;
     }
 
     public function getTipoMensualidad(): ?TipoMensualidad

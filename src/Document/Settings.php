@@ -19,6 +19,10 @@ class Settings
     protected ?string $facebook = null;
     #[MongoDB\Field(type: 'float')]
     protected float $monto_usd_mes = 0.0;
+    #[MongoDB\Field(type: 'int')]
+    protected int $dias_mes = 30;
+    #[MongoDB\Field(type: 'float')]
+    protected float $monto_usd_dia = 0.0;
 
     public function getId(): ?string
     {
@@ -73,5 +77,25 @@ class Settings
     public function setMontoUsdMes(float $monto_usd_mes): void
     {
         $this->monto_usd_mes = $monto_usd_mes;
+    }
+
+    public function getDiasMes(): int
+    {
+        return $this->dias_mes > 0 ? $this->dias_mes : 30;
+    }
+
+    public function setDiasMes(?int $dias_mes): void
+    {
+        $this->dias_mes = ($dias_mes !== null && $dias_mes > 0) ? $dias_mes : 30;
+    }
+
+    public function getMontoUsdDia(): float
+    {
+        return $this->monto_usd_dia;
+    }
+
+    public function setMontoUsdDia(?float $monto_usd_dia): void
+    {
+        $this->monto_usd_dia = $monto_usd_dia ?? 0.0;
     }
 }

@@ -54,7 +54,8 @@
                         <div class="text-center" ng-show="$ctrl.loading">
                             <i class="fa fa-spinner fa-spin fa-2x"></i>
                         </div>
-                        <table class="table table-hover" ng-hide="$ctrl.loading">
+                        <div class="table-responsive" ng-hide="$ctrl.loading" style="overflow-x: auto;">
+                        <table class="table table-hover">
                             <thead>
                             <tr>
                                 <th>C&oacute;digo</th>
@@ -81,6 +82,7 @@
                             </tr>
                             </tbody>
                         </table>
+                        </div>
                         <div class="text-center" ng-hide="$ctrl.loading || $ctrl.items.length > 0">
                             <p class="text-muted">No se encontraron tipos de mensualidad.</p>
                         </div>
@@ -110,7 +112,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button class="close" data-dismiss="modal">&times;</button>
+                        <button class="close" data-dismiss="modal" ng-disabled="$ctrl.guardando">&times;</button>
                         <h4 class="box-title">
                             <i class="fa fa-list-alt fa-fw"></i>
                             <span ng-hide="$ctrl.isEdit">Nuevo Tipo de Mensualidad</span>
@@ -127,14 +129,15 @@
                                     <div class="form-group">
                                         <label>C&oacute;digo</label>
                                         <input type="text" class="form-control" ng-model="$ctrl.formData.codigo"
-                                               placeholder="Ej: FULL-001" required>
+                                               placeholder="Ej: FULL-001" required ng-disabled="$ctrl.guardando">
                                     </div>
                                     <div class="form-group">
                                         <label>Monto (USD)</label>
                                         <div class="input-group">
                                             <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                                             <input type="number" step="0.01" min="0" class="form-control"
-                                                   ng-model="$ctrl.formData.monto" placeholder="0.00" required>
+                                                   ng-model="$ctrl.formData.monto" placeholder="0.00" required
+                                                   ng-disabled="$ctrl.guardando">
                                         </div>
                                     </div>
                                 </div>
@@ -144,7 +147,8 @@
                                         <div class="well well-sm" style="margin-bottom: 0; max-height: 200px; overflow-y: auto;">
                                             <div class="checkbox" ng-repeat="opcion in $ctrl.opcionesDescripcion" style="margin: 4px 0;">
                                                 <label>
-                                                    <input type="checkbox" ng-model="$ctrl.checksSeleccionados[opcion]">
+                                                    <input type="checkbox" ng-model="$ctrl.checksSeleccionados[opcion]"
+                                                           ng-disabled="$ctrl.guardando">
                                                     {% verbatim %}{{ opcion }}{% endverbatim %}
                                                 </label>
                                             </div>
@@ -154,13 +158,16 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal">
+                            <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal"
+                                    ng-disabled="$ctrl.guardando">
                                 Cancelar
                             </button>
-                            <button type="submit" class="btn btn-flat btn-primary">
-                                <i class="fa fa-save"></i>
-                                <span ng-hide="$ctrl.isEdit">Registrar</span>
-                                <span ng-show="$ctrl.isEdit">Actualizar</span>
+                            <button type="submit" class="btn btn-flat btn-primary" ng-disabled="$ctrl.guardando">
+                                <span class="btn-spinner" ng-show="$ctrl.guardando"></span>
+                                <i class="fa fa-save" ng-hide="$ctrl.guardando"></i>
+                                <span ng-show="$ctrl.guardando">Guardando...</span>
+                                <span ng-hide="$ctrl.guardando || $ctrl.isEdit">Registrar</span>
+                                <span ng-show="!$ctrl.guardando && $ctrl.isEdit">Actualizar</span>
                             </button>
                         </div>
                     </form>

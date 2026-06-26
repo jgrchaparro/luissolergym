@@ -6,11 +6,13 @@ app.controller('ngClienteController', function ($scope, $http) {
     $ctrl.clienteEliminar = {};
     $ctrl.isEdit = false;
     $ctrl.loading = false;
+    $ctrl.guardando = false;
     $ctrl.error = null;
     $ctrl.nacionalidades = ['V', 'E', 'P', 'J', 'G', 'M', 'C'];
     $ctrl.tiposMensualidad = [];
 
     $ctrl.busqueda = '';
+    $ctrl.estado = '';
     $ctrl.total = 0;
     $ctrl.limit = 10;
     $ctrl.paginaActual = 1;
@@ -23,7 +25,7 @@ app.controller('ngClienteController', function ($scope, $http) {
         var url = Routing.generate('cliente_listar_json');
 
         $http.get(url, {
-            params: {busqueda: $ctrl.busqueda, limit: $ctrl.limit, skip: skip}
+            params: {busqueda: $ctrl.busqueda, estado: $ctrl.estado, limit: $ctrl.limit, skip: skip}
         }).then(function (response) {
             $ctrl.clientes = response.data.data;
             $ctrl.total = response.data.total;
@@ -56,6 +58,7 @@ app.controller('ngClienteController', function ($scope, $http) {
 
     $ctrl.limpiarFiltro = function () {
         $ctrl.busqueda = '';
+        $ctrl.estado = '';
         $ctrl.paginaActual = 1;
         $ctrl.listar();
     };
@@ -98,7 +101,9 @@ app.controller('ngClienteController', function ($scope, $http) {
     };
 
     $ctrl.guardar = function () {
+        if ($ctrl.guardando) return;
         $ctrl.error = null;
+        $ctrl.guardando = true;
         var url = Routing.generate('cliente_guardar');
         var datos = angular.copy($ctrl.formData);
         datos.cedula = datos.nacionalidad + datos.cedulaNumero;
@@ -113,8 +118,10 @@ app.controller('ngClienteController', function ($scope, $http) {
             } else {
                 $ctrl.error = response.data.error;
             }
+            $ctrl.guardando = false;
         }, function () {
             $ctrl.error = 'Error al guardar el cliente';
+            $ctrl.guardando = false;
         });
     };
 

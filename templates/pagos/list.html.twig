@@ -1,0 +1,436 @@
+{% extends 'base.html.twig' %}
+
+{% block menu_principal %}
+    {{ include('Menu/menuprincipal.html.twig') }}
+{% endblock %}
+
+{% block title %}Pagos{% endblock %}
+
+{% block body %}
+    <div ng-app="ngMainApp" ng-controller="ngPagoController as $ctrl">
+
+        {# ===== HEADER ===== #}
+        <div class="box">
+            <div class="box-header with-border">
+                <i class="fa fa-money fa-fw"></i> Pagos
+                <div class="box-tools">
+                    <button class="btn btn-default btn-sm" ng-click="$ctrl.abrirModalMiembro()">
+                        <i class="fa fa-user-plus"></i>&nbsp; Registrar Miembro
+                    </button>
+                    <button class="btn btn-success btn-sm" ng-click="$ctrl.abrirModalPago()">
+                        <i class="fa fa-plus"></i>&nbsp; Registrar Pago
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {# ===== FILTROS + TABLA ===== #}
+        <div class="row">
+            <div class="col-md-3">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <i class="fa fa-filter fa-fw"></i> Filtros
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label>Rango de fechas</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                <input type="text" class="form-control" readonly
+                                       rango-fechas
+                                       desde="$ctrl.filtros.desde"
+                                       hasta="$ctrl.filtros.hasta"
+                                       style="background-color: #fff; cursor: pointer;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Buscar miembro (c&eacute;dula, nombre o apellido)</label>
+                            <input type="text" class="form-control" ng-model="$ctrl.filtros.busqueda"
+                                   ng-keypress="$event.keyCode === 13 && $ctrl.buscar()"
+                                   placeholder="Ingrese b&uacute;squeda...">
+                        </div>
+                        <button class="btn btn-primary btn-flat btn-block" ng-click="$ctrl.buscar()">
+                            <i class="fa fa-search"></i> Buscar
+                        </button>
+                        <button class="btn btn-default btn-flat btn-block" ng-click="$ctrl.limpiarFiltro()">
+                            <i class="fa fa-eraser"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                {# ===== MIEMBROS COINCIDENTES (cuando no hay pagos para el filtro) ===== #}
+                <div class="box box-warning" ng-show="$ctrl.miembrosRelacionados.length > 0">
+                    <div class="box-header with-border">
+                        <i class="fa fa-users fa-fw"></i> Miembros encontrados
+                    </div>
+                    <div class="box-body no-padding">
+                        <ul class="list-group" style="margin-bottom: 0;">
+                            <li class="list-group-item" ng-repeat="m in $ctrl.miembrosRelacionados">
+                                <div>
+                                    <span ng-bind="m.nombre"></span>
+                                    <span class="pull-right">
+                                        <span class="label label-danger" ng-if="!m.solvente">INSOLVENTE</span>
+                                        <i class="fa fa-check-circle text-green" ng-if="m.solvente" title="Solvente"></i>
+                                    </span>
+                                </div>
+                                <small class="text-muted">
+                                    {% verbatim %}{{ m.cedula }}{% endverbatim %}
+                                    <span ng-if="m.fechaVencimiento">&middot; vence {% verbatim %}{{ m.fechaVencimiento }}{% endverbatim %}</span>
+                                </small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="box">
+                    <div class="box-body">
+                        <div class="text-center" ng-show="$ctrl.loading">
+                            <i class="fa fa-spinner fa-spin fa-2x"></i>
+                        </div>
+                        <div class="table-responsive" ng-hide="$ctrl.loading" style="overflow-x: auto;">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Vence</th>
+                                <th>Miembro</th>
+                                <th>C&eacute;dula</th>
+                                <th>Tipo de Pago</th>
+                                <th class="text-right">Monto USD</th>
+                                <th class="text-right">Pagado</th>
+                                <th>Observaciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="item in $ctrl.items">
+                                <td ng-bind="item.fecha"></td>
+                                <td ng-bind="item.vence"></td>
+                                <td>
+                                    <span ng-bind="item.miembro"></span>
+                                    <span class="label label-warning" ng-if="item.esDia">D&iacute;a</span>
+                                </td>
+                                <td ng-bind="item.cedula"></td>
+                                <td ng-bind="item.tipoPago"></td>
+                                <td class="text-right">
+                                    <span ng-show="item.montoMensualidadUsd != null">{% verbatim %}$ {{ item.montoMensualidadUsd | number:2 }}{% endverbatim %}</span>
+                                    <span ng-show="item.montoMensualidadUsd == null" class="text-muted">&mdash;</span>
+                                </td>
+                                <td class="text-right">
+                                    {% verbatim %}{{ $ctrl.monedaSimbolo(item.moneda) }} {{ item.monto | number:2 }}{% endverbatim %}
+                                </td>
+                                <td ng-bind="item.observaciones"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                        <div class="text-center" ng-hide="$ctrl.loading || $ctrl.items.length > 0">
+                            <p class="text-muted">No se encontraron pagos para los filtros seleccionados.</p>
+                        </div>
+                    </div>
+                    <div class="box-footer clearfix" ng-hide="$ctrl.loading">
+                        <div class="pull-left" style="line-height: 34px;">
+                            Mostrando {% verbatim %}{{ $ctrl.items.length }}{% endverbatim %} de {% verbatim %}{{ $ctrl.total }}{% endverbatim %} registros
+                            &nbsp;|&nbsp; <strong>Total recaudado:</strong>
+                            <span class="label label-success" style="font-size: 13px;">$ {% verbatim %}{{ $ctrl.totales.USD | number:2 }}{% endverbatim %}</span>
+                            <span class="label label-primary" style="font-size: 13px;">Bs {% verbatim %}{{ $ctrl.totales.VEF | number:2 }}{% endverbatim %}</span>
+                            <span class="label label-warning" style="font-size: 13px;">COP {% verbatim %}{{ $ctrl.totales.COP | number:2 }}{% endverbatim %}</span>
+                        </div>
+                        <ul class="pagination pagination-sm no-margin pull-right">
+                            <li ng-class="{disabled: $ctrl.paginaActual <= 1}">
+                                <a href ng-click="$ctrl.irPagina($ctrl.paginaActual - 1)"><i class="fa fa-chevron-left"></i></a>
+                            </li>
+                            <li ng-repeat="p in $ctrl.paginas" ng-class="{active: p === $ctrl.paginaActual}">
+                                <a href ng-click="$ctrl.irPagina(p)" ng-bind="p"></a>
+                            </li>
+                            <li ng-class="{disabled: $ctrl.paginaActual >= $ctrl.totalPaginas}">
+                                <a href ng-click="$ctrl.irPagina($ctrl.paginaActual + 1)"><i class="fa fa-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ===== MODAL REGISTRAR PAGO ===== #}
+        <div class="modal" id="modalRegistrarPago" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" data-dismiss="modal" ng-disabled="$ctrl.guardando">&times;</button>
+                        <h4 class="box-title"><i class="fa fa-money fa-fw"></i> Registrar Pago</h4>
+                    </div>
+                    <form name="pagoForm" ng-submit="$ctrl.guardarPago()">
+                        <div class="modal-body">
+                            <div class="alert alert-danger" ng-show="$ctrl.error">
+                                <i class="fa fa-ban"></i> {% verbatim %}{{ $ctrl.error }}{% endverbatim %}
+                            </div>
+
+                            {# ----- Selector de modo ----- #}
+                            <div class="form-group">
+                                <div class="btn-group btn-group-justified" role="group">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn"
+                                                ng-class="$ctrl.modo === 'miembro' ? 'btn-primary' : 'btn-default'"
+                                                ng-click="$ctrl.setModo('miembro')" ng-disabled="$ctrl.guardando">
+                                            <i class="fa fa-user"></i> Miembro
+                                        </button>
+                                    </div>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn"
+                                                ng-class="$ctrl.modo === 'dia' ? 'btn-primary' : 'btn-default'"
+                                                ng-click="$ctrl.setModo('dia')" ng-disabled="$ctrl.guardando">
+                                            <i class="fa fa-calendar-o"></i> D&iacute;a de entrenamiento
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# ----- Buscador de miembro (typeahead) ----- #}
+                            <div class="form-group" ng-show="$ctrl.modo === 'miembro' && !$ctrl.miembroSeleccionado">
+                                <label>Miembro <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                    <input type="text" class="form-control" ng-model="$ctrl.miembroBusqueda"
+                                           ng-change="$ctrl.buscarMiembros()"
+                                           ng-disabled="$ctrl.guardando"
+                                           placeholder="Escriba c&eacute;dula, nombre o apellido..."
+                                           autocomplete="off">
+                                </div>
+
+                                <div style="position: relative;">
+                                    <div class="list-group" style="position: absolute; width: 100%; z-index: 1060;
+                                         max-height: 240px; overflow-y: auto; margin-top: 2px;
+                                         box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
+                                         ng-show="$ctrl.miembrosEncontrados.length > 0">
+                                        <a href class="list-group-item"
+                                           ng-repeat="m in $ctrl.miembrosEncontrados"
+                                           ng-click="$ctrl.seleccionarMiembro(m)">
+                                            <strong ng-bind="m.nombre"></strong>
+                                            <span class="text-muted">&nbsp;&middot;&nbsp;{% verbatim %}{{ m.cedula }}{% endverbatim %}</span>
+                                            <span class="label label-info pull-right" ng-if="m.tipoMensualidadCodigo"
+                                                  ng-bind="m.tipoMensualidadCodigo"></span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <p class="help-block" ng-show="$ctrl.buscandoMiembros">
+                                    <span class="btn-spinner" style="border-color: rgba(0,0,0,0.2); border-top-color: #555;"></span>
+                                    Buscando...
+                                </p>
+                                <p class="help-block"
+                                   ng-show="!$ctrl.buscandoMiembros && $ctrl.miembroBusqueda.length >= 2 && $ctrl.miembrosEncontrados.length === 0">
+                                    No se encontraron miembros.
+                                </p>
+                            </div>
+
+                            {# ----- Miembro seleccionado ----- #}
+                            <div class="well well-sm" ng-show="$ctrl.modo === 'miembro' && $ctrl.miembroSeleccionado" style="margin-bottom: 15px;">
+                                <button type="button" class="btn btn-xs btn-default pull-right"
+                                        ng-click="$ctrl.cambiarMiembro()" ng-disabled="$ctrl.guardando">
+                                    <i class="fa fa-exchange"></i> Cambiar
+                                </button>
+                                <i class="fa fa-user fa-fw text-muted"></i>
+                                <strong ng-bind="$ctrl.miembroSeleccionado.nombre"></strong><br>
+                                <span class="text-muted">
+                                    C.I. {% verbatim %}{{ $ctrl.miembroSeleccionado.cedula }}{% endverbatim %}
+                                </span>
+                                <span class="label label-info" ng-if="$ctrl.miembroSeleccionado.tipoMensualidadCodigo"
+                                      ng-bind="$ctrl.miembroSeleccionado.tipoMensualidadCodigo"></span>
+                                <span class="label label-success" ng-if="$ctrl.miembroSeleccionado.solvente">Solvente</span>
+                                <span class="label label-warning" ng-if="!$ctrl.miembroSeleccionado.solvente">No solvente</span>
+                            </div>
+
+                            {# ----- Día de entrenamiento (cliente no registrado) ----- #}
+                            <div ng-show="$ctrl.modo === 'dia'">
+                                <div class="alert alert-warning" ng-show="!($ctrl.tasa.montoUsdDia > 0)" style="margin-bottom: 15px;">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                    No hay un <strong>Monto USD D&iacute;a</strong> configurado. Defínalo en Configuraciones.
+                                </div>
+                                <div class="well well-sm" ng-show="$ctrl.tasa.montoUsdDia > 0" style="margin-bottom: 15px;">
+                                    <strong><i class="fa fa-calendar-o fa-fw"></i> Costo del d&iacute;a de entrenamiento</strong>
+                                    <table class="table table-condensed" style="margin: 8px 0 0;">
+                                        <tr ng-class="{'bg-info': $ctrl.monedaActual() === 'USD'}">
+                                            <td>D&oacute;lares</td>
+                                            <td class="text-right"><strong>$ {% verbatim %}{{ $ctrl.costoDiaEn('USD') | number:2 }}{% endverbatim %}</strong></td>
+                                        </tr>
+                                        <tr ng-class="{'bg-info': $ctrl.monedaActual() === 'VEF'}">
+                                            <td>Bol&iacute;vares</td>
+                                            <td class="text-right"><strong>Bs {% verbatim %}{{ $ctrl.costoDiaEn('VEF') | number:2 }}{% endverbatim %}</strong></td>
+                                        </tr>
+                                        <tr ng-class="{'bg-info': $ctrl.monedaActual() === 'COP'}">
+                                            <td>Pesos</td>
+                                            <td class="text-right"><strong>COP {% verbatim %}{{ $ctrl.costoDiaEn('COP') | number:2 }}{% endverbatim %}</strong></td>
+                                        </tr>
+                                    </table>
+                                    <p class="help-block" style="margin: 6px 0 0;">
+                                        La fila resaltada corresponde a la moneda del tipo de pago elegido abajo.
+                                    </p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nombre / referencia <span class="text-muted">(opcional)</span></label>
+                                    <input type="text" class="form-control" ng-model="$ctrl.pago.nombre"
+                                           ng-disabled="$ctrl.guardando"
+                                           placeholder="Ej: visitante, nombre del cliente ocasional...">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Tipo de Pago <span class="text-danger">*</span></label>
+                                <select class="form-control" ng-model="$ctrl.pago.tipo_pago_id"
+                                        ng-change="$ctrl.recalcularMonto()"
+                                        ng-disabled="$ctrl.guardando" required>
+                                    <option value="">-- Seleccione --</option>
+                                    <option ng-repeat="tp in $ctrl.tiposPago" value="{% verbatim %}{{ tp.id }}{% endverbatim %}">
+                                        {% verbatim %}{{ tp.codigo }} - {{ tp.descripcion }} ({{ tp.moneda }}){% endverbatim %}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Monto <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-addon" ng-bind="$ctrl.monedaSimbolo($ctrl.monedaActual())"></span>
+                                    <input type="number" step="0.01" min="0.01" class="form-control"
+                                           ng-model="$ctrl.pago.monto" placeholder="0.00"
+                                           ng-disabled="$ctrl.guardando" required>
+                                </div>
+                                <p class="help-block" ng-show="$ctrl.miembroSeleccionado && $ctrl.miembroSeleccionado.montoSugerido != null"
+                                   style="margin-bottom: 0;">
+                                    Mensualidad: {% verbatim %}<strong>$ {{ $ctrl.miembroSeleccionado.montoSugerido | number:2 }}</strong>{% endverbatim %}
+                                    <span ng-show="$ctrl.monedaActual() !== 'USD'">
+                                        &middot; Tasa {% verbatim %}{{ $ctrl.monedaActual() }}: {{ ($ctrl.monedaActual() === 'VEF' ? $ctrl.tasa.usdVef : $ctrl.tasa.usdCop) | number:2 }}{% endverbatim %}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <label>Observaciones</label>
+                                <textarea class="form-control" rows="2" ng-model="$ctrl.pago.observaciones"
+                                          ng-disabled="$ctrl.guardando"
+                                          placeholder="Observaciones (opcional)"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal"
+                                    ng-disabled="$ctrl.guardando">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-flat btn-primary" ng-disabled="$ctrl.guardando">
+                                <span class="btn-spinner" ng-show="$ctrl.guardando"></span>
+                                <i class="fa fa-save" ng-hide="$ctrl.guardando"></i>
+                                <span ng-show="$ctrl.guardando">Guardando...</span>
+                                <span ng-hide="$ctrl.guardando">Registrar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# ===== MODAL REGISTRAR MIEMBRO ===== #}
+        <div class="modal" id="modalMiembro" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" data-dismiss="modal" ng-disabled="$ctrl.guardandoMiembro">&times;</button>
+                        <h4 class="box-title"><i class="fa fa-user fa-fw"></i> Nuevo Miembro</h4>
+                    </div>
+                    <form name="miembroForm" ng-submit="$ctrl.guardarMiembro()">
+                        <div class="modal-body">
+                            <div class="alert alert-danger" ng-show="$ctrl.errorMiembro">
+                                <i class="fa fa-ban"></i> {% verbatim %}{{ $ctrl.errorMiembro }}{% endverbatim %}
+                            </div>
+                            <div class="form-group" ng-class="{'has-error': miembroForm.cedula.$touched && miembroForm.cedula.$invalid}">
+                                <label>C&eacute;dula</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon" style="padding: 0; border: none;">
+                                        <select class="form-control" ng-model="$ctrl.miembro.nacionalidad"
+                                                ng-options="n for n in $ctrl.nacionalidades"
+                                                style="border-radius: 4px 0 0 4px; min-width: 60px;"
+                                                ng-disabled="$ctrl.guardandoMiembro" required>
+                                        </select>
+                                    </span>
+                                    <input type="text" name="cedula" class="form-control"
+                                           ng-model="$ctrl.miembro.cedulaNumero"
+                                           solo-numeros
+                                           ng-pattern="/^\d{6,9}$/"
+                                           ng-minlength="6" ng-maxlength="9"
+                                           maxlength="9"
+                                           placeholder="Ej: 15999636"
+                                           ng-disabled="$ctrl.guardandoMiembro" required>
+                                </div>
+                                <span class="help-block" ng-show="miembroForm.cedula.$touched && miembroForm.cedula.$error.required">
+                                    La c&eacute;dula es obligatoria.
+                                </span>
+                                <span class="help-block" ng-show="miembroForm.cedula.$touched && miembroForm.cedula.$error.pattern">
+                                    Solo n&uacute;meros, m&iacute;nimo 6 y m&aacute;ximo 9 d&iacute;gitos.
+                                </span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Nombres</label>
+                                        <input type="text" class="form-control" ng-model="$ctrl.miembro.nombres"
+                                               ng-disabled="$ctrl.guardandoMiembro" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Apellidos</label>
+                                        <input type="text" class="form-control" ng-model="$ctrl.miembro.apellidos"
+                                               ng-disabled="$ctrl.guardandoMiembro" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" class="form-control" ng-model="$ctrl.miembro.email"
+                                               ng-disabled="$ctrl.guardandoMiembro" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tel&eacute;fono</label>
+                                        <input type="text" class="form-control" ng-model="$ctrl.miembro.telefono"
+                                               ng-disabled="$ctrl.guardandoMiembro" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo de Mensualidad</label>
+                                <mensualidad-picker items="$ctrl.tiposMensualidad"
+                                                    model="$ctrl.miembro.tipo_mensualidad_id"
+                                                    disabled="$ctrl.guardandoMiembro"></mensualidad-picker>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal"
+                                    ng-disabled="$ctrl.guardandoMiembro">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-flat btn-primary" ng-disabled="$ctrl.guardandoMiembro">
+                                <span class="btn-spinner" ng-show="$ctrl.guardandoMiembro"></span>
+                                <i class="fa fa-save" ng-hide="$ctrl.guardandoMiembro"></i>
+                                <span ng-show="$ctrl.guardandoMiembro">Guardando...</span>
+                                <span ng-hide="$ctrl.guardandoMiembro">Registrar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/toast.js') }}"></script>
+    <script src="{{ asset('js/appInit.js') }}"></script>
+    <script src="{{ asset('js/angular/shared-directives.js') }}"></script>
+    <script src="{{ asset('js/angular/pago-controller.js') }}"></script>
+{% endblock %}

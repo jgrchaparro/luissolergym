@@ -42,6 +42,14 @@
                                 </span>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <select class="form-control" ng-model="$ctrl.estado" ng-change="$ctrl.buscar()">
+                                <option value="">Todos</option>
+                                <option value="vencido">Vencidos</option>
+                                <option value="aldia">Al d&iacute;a</option>
+                            </select>
+                        </div>
                         <button class="btn btn-default btn-flat btn-block" ng-click="$ctrl.limpiarFiltro()">
                             <i class="fa fa-eraser"></i> Limpiar
                         </button>
@@ -54,7 +62,8 @@
                         <div class="text-center" ng-show="$ctrl.loading">
                             <i class="fa fa-spinner fa-spin fa-2x"></i>
                         </div>
-                        <table class="table table-hover" ng-hide="$ctrl.loading">
+                        <div class="table-responsive" ng-hide="$ctrl.loading" style="overflow-x: auto;">
+                        <table class="table table-hover">
                             <thead>
                             <tr>
                                 <th>Cédula</th>
@@ -63,6 +72,7 @@
                                 <th>Email</th>
                                 <th>Teléfono</th>
                                 <th>Tipo Mensualidad</th>
+                                <th>Vence</th>
                                 <th>Fecha Creación</th>
                                 <th class="text-right"><i class="fa fa-cogs fa-fw"></i> Acciones</th>
                             </tr>
@@ -75,11 +85,15 @@
                                 <td ng-bind="cliente.email"></td>
                                 <td ng-bind="cliente.telefono"></td>
                                 <td><span class="label label-info" ng-if="cliente.tipoMensualidadCodigo" ng-bind="cliente.tipoMensualidadCodigo"></span></td>
+                                <td>
+                                    <span ng-if="cliente.fechaVencimiento" ng-bind="cliente.fechaVencimiento"></span>
+                                    <span ng-if="!cliente.fechaVencimiento" class="text-muted">&mdash;</span>
+                                    <span class="label label-default" ng-if="cliente.sinPagos">Sin pagos</span>
+                                    <span class="label label-danger" ng-if="cliente.vencido && !cliente.sinPagos">Vencido</span>
+                                    <span class="label label-success" ng-if="!cliente.vencido">Al d&iacute;a</span>
+                                </td>
                                 <td ng-bind="cliente.fechaCreacion"></td>
                                 <td class="text-right">
-                                    <button class="btn btn-default btn-sm" ng-click="$ctrl.verDetalle(cliente.id)">
-                                        <i class="fa fa-eye fa-fw"></i>
-                                    </button>
                                     <button class="btn btn-default btn-sm" ng-click="$ctrl.abrirModalEditar(cliente.id)">
                                         <i class="fa fa-pencil fa-fw"></i>
                                     </button>
@@ -90,6 +104,7 @@
                             </tr>
                             </tbody>
                         </table>
+                        </div>
                         <div class="text-center" ng-hide="$ctrl.loading || $ctrl.clientes.length > 0">
                             <p class="text-muted">No se encontraron clientes.</p>
                         </div>
@@ -119,7 +134,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button class="close" data-dismiss="modal">&times;</button>
+                        <button class="close" data-dismiss="modal" ng-disabled="$ctrl.guardando">&times;</button>
                         <h4 class="box-title">
                             <i class="fa fa-user fa-fw"></i>
                             <span ng-hide="$ctrl.isEdit">Nuevo Cliente</span>
@@ -137,7 +152,8 @@
                                     <span class="input-group-addon" style="padding: 0; border: none;">
                                         <select class="form-control" ng-model="$ctrl.formData.nacionalidad"
                                                 ng-options="n for n in $ctrl.nacionalidades"
-                                                style="border-radius: 4px 0 0 4px; min-width: 60px;" required>
+                                                style="border-radius: 4px 0 0 4px; min-width: 60px;" required
+                                                ng-disabled="$ctrl.guardando">
                                         </select>
                                     </span>
                                     <input type="text" name="cedula" class="form-control"
@@ -147,7 +163,7 @@
                                            ng-minlength="6" ng-maxlength="9"
                                            maxlength="9"
                                            placeholder="Ej: 15999636"
-                                           required>
+                                           required ng-disabled="$ctrl.guardando">
                                 </div>
                                 <span class="help-block" ng-show="clienteForm.cedula.$touched && clienteForm.cedula.$error.required">
                                     La cédula es obligatoria.
@@ -160,13 +176,15 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Nombres</label>
-                                        <input type="text" class="form-control" ng-model="$ctrl.formData.nombres" required>
+                                        <input type="text" class="form-control" ng-model="$ctrl.formData.nombres" required
+                                               ng-disabled="$ctrl.guardando">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Apellidos</label>
-                                        <input type="text" class="form-control" ng-model="$ctrl.formData.apellidos" required>
+                                        <input type="text" class="form-control" ng-model="$ctrl.formData.apellidos" required
+                                               ng-disabled="$ctrl.guardando">
                                     </div>
                                 </div>
                             </div>
@@ -174,36 +192,36 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Email</label>
-                                        <input type="email" class="form-control" ng-model="$ctrl.formData.email" required>
+                                        <input type="email" class="form-control" ng-model="$ctrl.formData.email" required
+                                               ng-disabled="$ctrl.guardando">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Teléfono</label>
-                                        <input type="text" class="form-control" ng-model="$ctrl.formData.telefono" required>
+                                        <input type="text" class="form-control" ng-model="$ctrl.formData.telefono" required
+                                               ng-disabled="$ctrl.guardando">
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label>Tipo de Mensualidad</label>
-                                <select class="form-control" ng-model="$ctrl.formData.tipo_mensualidad_id">
-                                    <option value="">-- Seleccione --</option>
-                                    <option ng-repeat="tipo in $ctrl.tiposMensualidad"
-                                            ng-value="tipo.id"
-                                            ng-selected="tipo.id === $ctrl.formData.tipo_mensualidad_id">
-                                        {% verbatim %}{{ tipo.codigo }} - {{ tipo.descripcion }}{% endverbatim %}
-                                    </option>
-                                </select>
+                                <mensualidad-picker items="$ctrl.tiposMensualidad"
+                                                    model="$ctrl.formData.tipo_mensualidad_id"
+                                                    disabled="$ctrl.guardando"></mensualidad-picker>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal">
+                            <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal"
+                                    ng-disabled="$ctrl.guardando">
                                 Cancelar
                             </button>
-                            <button type="submit" class="btn btn-flat btn-primary">
-                                <i class="fa fa-save"></i>
-                                <span ng-hide="$ctrl.isEdit">Registrar</span>
-                                <span ng-show="$ctrl.isEdit">Actualizar</span>
+                            <button type="submit" class="btn btn-flat btn-primary" ng-disabled="$ctrl.guardando">
+                                <span class="btn-spinner" ng-show="$ctrl.guardando"></span>
+                                <i class="fa fa-save" ng-hide="$ctrl.guardando"></i>
+                                <span ng-show="$ctrl.guardando">Guardando...</span>
+                                <span ng-hide="$ctrl.guardando || $ctrl.isEdit">Registrar</span>
+                                <span ng-show="!$ctrl.guardando && $ctrl.isEdit">Actualizar</span>
                             </button>
                         </div>
                     </form>
@@ -254,5 +272,6 @@
 {% block javascripts %}
     <script src="{{ asset('js/toast.js') }}"></script>
     <script src="{{ asset('js/appInit.js') }}"></script>
+    <script src="{{ asset('js/angular/shared-directives.js') }}"></script>
     <script src="{{ asset('js/angular/cliente-controller.js') }}"></script>
 {% endblock %}

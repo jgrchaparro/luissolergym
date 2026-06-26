@@ -6,6 +6,7 @@ app.controller('ngTipoPagoController', function ($scope, $http) {
     $ctrl.itemEliminar = {};
     $ctrl.isEdit = false;
     $ctrl.loading = false;
+    $ctrl.guardando = false;
     $ctrl.error = null;
 
     $ctrl.busqueda = '';
@@ -59,7 +60,7 @@ app.controller('ngTipoPagoController', function ($scope, $http) {
     };
 
     $ctrl.abrirModalAgregar = function () {
-        $ctrl.formData = {};
+        $ctrl.formData = {moneda: 'USD'};
         $ctrl.isEdit = false;
         $ctrl.error = null;
         $('#modalTipoPago').modal('show');
@@ -81,7 +82,9 @@ app.controller('ngTipoPagoController', function ($scope, $http) {
     };
 
     $ctrl.guardar = function () {
+        if ($ctrl.guardando) return;
         $ctrl.error = null;
+        $ctrl.guardando = true;
         var url = Routing.generate('tipo_pago_guardar');
 
         $http.get(url, {params: $ctrl.formData}).then(function (response) {
@@ -92,8 +95,10 @@ app.controller('ngTipoPagoController', function ($scope, $http) {
             } else {
                 $ctrl.error = response.data.error;
             }
+            $ctrl.guardando = false;
         }, function (response) {
             $ctrl.error = (response && response.data && response.data.error) ? response.data.error : 'Error al guardar';
+            $ctrl.guardando = false;
         });
     };
 

@@ -54,7 +54,8 @@
                         <div class="text-center" ng-show="$ctrl.loading">
                             <i class="fa fa-spinner fa-spin fa-2x"></i>
                         </div>
-                        <table class="table table-hover" ng-hide="$ctrl.loading">
+                        <div class="table-responsive" ng-hide="$ctrl.loading" style="overflow-x: auto;">
+                        <table class="table table-hover">
                             <thead>
                             <tr>
                                 <th>USD / VEF</th>
@@ -72,6 +73,7 @@
                             </tr>
                             </tbody>
                         </table>
+                        </div>
                         <div class="text-center" ng-hide="$ctrl.loading || $ctrl.tasas.length > 0">
                             <p class="text-muted">No se encontraron tasas.</p>
                         </div>

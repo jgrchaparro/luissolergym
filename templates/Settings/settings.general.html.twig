@@ -69,6 +69,26 @@
                             </div>
                             {{ form_errors(form.monto_usd_mes) }}
                         </div>
+
+                        <div class="form-group {{ form.dias_mes.vars.errors|length > 0 ? 'has-error' : '' }}">
+                            {{ form_label(form.dias_mes) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                {{ form_widget(form.dias_mes, {'attr': {'class': 'form-control', 'min': '1'}}) }}
+                            </div>
+                            <span class="help-block" style="margin-bottom: 0;">D&iacute;as de vigencia de cada pago mensual (para calcular el vencimiento).</span>
+                            {{ form_errors(form.dias_mes) }}
+                        </div>
+
+                        <div class="form-group {{ form.monto_usd_dia.vars.errors|length > 0 ? 'has-error' : '' }}">
+                            {{ form_label(form.monto_usd_dia) }}
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                {{ form_widget(form.monto_usd_dia, {'attr': {'class': 'form-control', 'step': '0.01', 'min': '0'}}) }}
+                            </div>
+                            <span class="help-block" style="margin-bottom: 0;">Costo de un d&iacute;a de entrenamiento (clientes no registrados).</span>
+                            {{ form_errors(form.monto_usd_dia) }}
+                        </div>
                     </div>
                 </div>
             </div>

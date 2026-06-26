@@ -6,6 +6,7 @@ app.controller('ngTipoMensualidadController', function ($scope, $http) {
     $ctrl.itemEliminar = {};
     $ctrl.isEdit = false;
     $ctrl.loading = false;
+    $ctrl.guardando = false;
     $ctrl.error = null;
 
     $ctrl.busqueda = '';
@@ -123,7 +124,9 @@ app.controller('ngTipoMensualidadController', function ($scope, $http) {
     };
 
     $ctrl.guardar = function () {
+        if ($ctrl.guardando) return;
         $ctrl.error = null;
+        $ctrl.guardando = true;
         var url = Routing.generate('tipo_mensualidad_guardar');
         var datos = angular.copy($ctrl.formData);
         datos.descripcion = $ctrl.construirDescripcion();
@@ -136,8 +139,10 @@ app.controller('ngTipoMensualidadController', function ($scope, $http) {
             } else {
                 $ctrl.error = response.data.error;
             }
+            $ctrl.guardando = false;
         }, function () {
             $ctrl.error = 'Error al guardar';
+            $ctrl.guardando = false;
         });
     };
 

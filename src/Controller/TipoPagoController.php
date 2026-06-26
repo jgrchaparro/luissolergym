@@ -45,6 +45,7 @@ class TipoPagoController extends AbstractController
                 'numero' => $tipo->getNumero(),
                 'titular' => $tipo->getTitular(),
                 'rif' => $tipo->getRif(),
+                'moneda' => $tipo->getMoneda(),
                 'fechaCreacion' => $tipo->getFechaCreacion() ? $tipo->getFechaCreacion()->format('d/m/Y H:i') : '',
             ];
         }
@@ -71,6 +72,7 @@ class TipoPagoController extends AbstractController
                 'numero' => $tipo->getNumero(),
                 'titular' => $tipo->getTitular(),
                 'rif' => $tipo->getRif(),
+                'moneda' => $tipo->getMoneda(),
             ],
         ]);
     }
@@ -105,6 +107,9 @@ class TipoPagoController extends AbstractController
         $tipo->setNumero(isset($params['numero']) ? trim($params['numero']) : null);
         $tipo->setTitular(isset($params['titular']) ? trim($params['titular']) : null);
         $tipo->setRif(isset($params['rif']) ? trim($params['rif']) : null);
+
+        $moneda = strtoupper(trim($params['moneda'] ?? 'USD'));
+        $tipo->setMoneda(in_array($moneda, ['USD', 'VEF', 'COP'], true) ? $moneda : 'USD');
 
         $this->documentManager->persist($tipo);
         $this->documentManager->flush();

@@ -22,6 +22,8 @@ class TipoPago
     protected ?string $titular = null;
     #[MongoDB\Field(type: 'string')]
     protected ?string $rif = null;
+    #[MongoDB\Field(type: 'string')]
+    protected ?string $moneda = 'USD';
 
     public function __construct()
     {
@@ -91,5 +93,15 @@ class TipoPago
     public function setTitular(?string $titular): void
     {
         $this->titular = $titular;
+    }
+
+    public function getMoneda(): ?string
+    {
+        return $this->moneda ?: 'USD';
+    }
+
+    public function setMoneda(?string $moneda): void
+    {
+        $this->moneda = $moneda ?: 'USD';
     }
 }

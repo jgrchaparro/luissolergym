@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Document\Cliente;
 use App\Document\Movimientos;
+use App\Document\Settings;
 use App\Document\Tasas;
 use App\Document\TipoMensualidad;
 use App\Document\TipoPago;
@@ -29,6 +30,12 @@ class ClienteController extends AbstractController
         return $this->render('cliente/list.html.twig');
     }
 
+    #[Route('/cliente/vencidos/', name: 'cliente_vencidos')]
+    public function vencidosAction(): Response
+    {
+        return $this->render('cliente/vencidos.html.twig');
+    }
+
     #[Route('/cliente/tipos-mensualidad/', name: 'cliente_tipos_mensualidad', options: ['expose' => true])]
     public function tiposMensualidadAction(): JsonResponse
     {
@@ -39,6 +46,7 @@ class ClienteController extends AbstractController
                 'id' => $tipo->getId(),
                 'codigo' => $tipo->getCodigo(),
                 'descripcion' => $tipo->getDescripcion(),
+                'monto' => $tipo->getMonto(),
             ];
         }
         return new JsonResponse($data);
@@ -48,16 +56,23 @@ class ClienteController extends AbstractController
     public function listarJsonAction(Request $request): JsonResponse
     {
         $busqueda = $request->query->get('busqueda', '');
+        $estado = $request->query->get('estado', '');
+        $orden = $request->query->get('orden', '');
         $limit = (int) $request->query->get('limit', 10);
         $skip = (int) $request->query->get('skip', 0);
 
         /** @var \App\Repository\ClienteRepository $repo */
         $repo = $this->documentManager->getRepository(Cliente::class);
-        $resultado = $repo->buscarPaginado($busqueda, $limit, $skip);
+        $resultado = $repo->buscarPaginado($busqueda, $limit, $skip, $estado, $orden);
 
+        $hoy = new \DateTime();
         $data = [];
         foreach ($resultado['data'] as $cliente) {
             $tipoMens = $cliente->getTipoMensualidad();
+            $venc = $cliente->getFechaVencimiento();
+            $sinPagos = $venc === null;
+            $vencido = $sinPagos || $venc < $hoy;
+            $diasVencido = ($venc && $venc < $hoy) ? (int) $hoy->diff($venc)->days : null;
             $data[] = [
                 'id' => $cliente->getId(),
                 'cedula' => $cliente->getCedula(),
@@ -66,6 +81,10 @@ class ClienteController extends AbstractController
                 'email' => $cliente->getEmail(),
                 'telefono' => $cliente->getTelefono(),
                 'tipoMensualidadCodigo' => $tipoMens ? $tipoMens->getCodigo() : '',
+                'fechaVencimiento' => $venc ? $venc->format('d/m/Y') : null,
+                'vencido' => $vencido,
+                'sinPagos' => $sinPagos,
+                'diasVencido' => $diasVencido,
                 'fechaCreacion' => $cliente->getFechaCreacion() ? $cliente->getFechaCreacion()->format('d/m/Y H:i') : '',
             ];
         }
@@ -171,6 +190,7 @@ class ClienteController extends AbstractController
                 'id' => $tipo->getId(),
                 'codigo' => $tipo->getCodigo(),
                 'descripcion' => $tipo->getDescripcion(),
+                'moneda' => $tipo->getMoneda(),
             ];
         }
         return new JsonResponse($data);
@@ -205,15 +225,69 @@ class ClienteController extends AbstractController
             return new JsonResponse(['success' => false, 'error' => 'Tipo de pago no encontrado'], 404);
         }
 
+        $tipoMens = $cliente->getTipoMensualidad();
+        $mensualidadUsd = $tipoMens ? $tipoMens->getMonto() : 0.0;
+        $moneda = $tipoPago->getMoneda();
+
+        // Convertir lo pagado a USD según la moneda del tipo de pago y la tasa vigente.
+        $tasa = $this->documentManager->getRepository(Tasas::class)
+            ->findOneBy([], ['fechaCreacion' => -1]);
+        $pagadoUsd = $monto;
+        if ($moneda === 'VEF') {
+            $usdVef = $tasa ? $tasa->getUsdVef() : 0.0;
+            $pagadoUsd = $usdVef > 0 ? $monto / $usdVef : 0.0;
+        } elseif ($moneda === 'COP') {
+            $usdCop = $tasa ? $tasa->getUsdCop() : 0.0;
+            $pagadoUsd = $usdCop > 0 ? $monto / $usdCop : 0.0;
+        }
+
+        // Vigencia que otorga el pago, proporcional a lo abonado respecto a la mensualidad:
+        //   meses completos (+1 mes calendario c/u) + fracción proporcional a "Días/Mes".
+        // Ej: paga 50% -> +15 días; paga 100% -> +1 mes; paga 150% -> +1 mes y 15 días.
+        $settings = $this->documentManager->getRepository(Settings::class)->findOneBy([]);
+        $diasMes = $settings ? $settings->getDiasMes() : 30;
+
+        $fechaVencimiento = null;
+        if ($mensualidadUsd > 0 && $pagadoUsd > 0) {
+            $ratio = $pagadoUsd / $mensualidadUsd;
+            $mesesEnteros = (int) floor($ratio);
+            $diasExtra = (int) round(($ratio - $mesesEnteros) * $diasMes);
+
+            if ($mesesEnteros > 0 || $diasExtra > 0) {
+                $hoy = new \DateTime();
+                $base = $cliente->getFechaVencimiento();
+                // Acumula desde el vencimiento vigente si aún no ha vencido; si no, desde hoy.
+                if (!$base || $base < $hoy) {
+                    $base = $hoy;
+                }
+                $fechaVencimiento = clone $base;
+                if ($mesesEnteros > 0) {
+                    $fechaVencimiento->modify('+' . $mesesEnteros . ' months');
+                }
+                if ($diasExtra > 0) {
+                    $fechaVencimiento->modify('+' . $diasExtra . ' days');
+                }
+            }
+        }
+
         $movimiento = new Movimientos();
-        $movimiento->setTipoMvto('mensualidad');
         $movimiento->setCliente($cliente);
         $movimiento->setTipoPago($tipoPago);
         $movimiento->setMonto($monto);
+        $movimiento->setMoneda($moneda);
+        $movimiento->setMontoUsdRef($mensualidadUsd > 0 ? $mensualidadUsd : null);
+        $movimiento->setFechaVencimiento($fechaVencimiento);
         $movimiento->setTipoMvto('PAGO');
         $movimiento->setObservaciones($observaciones !== '' ? $observaciones : null);
-
         $this->documentManager->persist($movimiento);
+
+        // Denormalizar el vencimiento y la solvencia en el cliente (para el listado de vencidos).
+        if ($fechaVencimiento) {
+            $cliente->setFechaVencimiento($fechaVencimiento);
+            $cliente->setSolvente(true);
+            $this->documentManager->persist($cliente);
+        }
+
         $this->documentManager->flush();
 
         return new JsonResponse([
