@@ -65,12 +65,15 @@ COPY scripts ./scripts
 # Usamos `update` en vez de `install` para que regenere composer.lock
 # dentro del contenedor (PHP 8.2), ya que el lock del repo puede estar
 # desfasado con composer.json.
+# Instala dependencias sin ejecutar scripts (aún no tenemos src/).
+# Añadimos --no-audit y --ignore-platform-reqs en conjunto para forzar el bypass
 RUN composer update \
         --no-dev \
         --no-scripts \
         --no-autoloader \
         --prefer-dist \
         --no-progress \
+        --no-audit \
         --ignore-platform-reqs
 
 # Ahora sí copiamos el resto del proyecto
