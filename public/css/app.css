@@ -1554,3 +1554,16 @@
 .icon-form{
     pointer-events: auto;
      cursor: pointer}
+/* Fix: en mobile la regla de AdminLTE forzaba color:#fff en los enlaces del
+   dropdown, dejando "Salir"/"Perfil" en blanco sobre el fondo claro del
+   user-footer. Forzamos el fondo oscuro de marca + texto blanco. */
+.skin-blue-light .main-header .navbar .dropdown-menu .user-footer a.btn-primary,
+.skin-blue .main-header .navbar .dropdown-menu .user-footer a.btn-primary{
+    color:#fff!important;
+    background-color:#374151!important;
+    border-color:#374151!important}
+.skin-blue-light .main-header .navbar .dropdown-menu .user-footer a.btn-primary:hover,
+.skin-blue .main-header .navbar .dropdown-menu .user-footer a.btn-primary:hover{
+    color:#fff!important;
+    background-color:#1f2937!important;
+    border-color:#1f2937!important}
