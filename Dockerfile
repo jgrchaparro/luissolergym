@@ -87,11 +87,11 @@ ENV MONGODB_URL=mongodb://localhost:27017 \
     MOSTRAR_CAPTCHA=0 \
     MOSTRAR_NOTIFICACION_PREGUNTAS_SEGURIDAD=0
 
-# Optimizamos el Autoload diciéndole que ignore los checks estrictos de versión PHP
+# Optimizamos el Autoload diciéndole que ignore los checks estrictos (aquí sí funciona la bandera)
 RUN composer dump-autoload --classmap-authoritative --no-dev --ignore-platform-reqs
 
-# Ejecutamos el post-install ignorando también la verificación de PHP
-RUN composer run-script post-install-cmd --no-dev --ignore-platform-reqs
+# Desactivamos el chequeo de plataforma inyectando la variable de entorno de Composer
+RUN COMPOSER_IGNORE_PLATFORM_REQS=1 composer run-script post-install-cmd --no-dev
 
 # ---- Permisos y carpetas de caché ----------------------------------------
 RUN mkdir -p var/cache var/log \
