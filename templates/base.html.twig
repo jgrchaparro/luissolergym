@@ -15,6 +15,14 @@
         /* Labels de Bootstrap vienen en bold (700); se aligera para mejorar
            la legibilidad de montos y textos, sobre todo en pantallas pequeñas. */
         .label { font-weight: 500; }
+
+        /* En móvil AdminLTE apila el logo (imagen de fondo negro) a todo lo
+           ancho encima de la barra de navegación, generando un recuadro negro
+           que rompe la estética. Se oculta y se deja solo la barra superior. */
+        @media (max-width: 767px) {
+            .main-header .logo { display: none; }
+            .main-header .navbar { margin-left: 0; }
+        }
     </style>
 
 </head>
