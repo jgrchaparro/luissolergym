@@ -70,7 +70,8 @@ RUN composer update \
         --no-scripts \
         --no-autoloader \
         --prefer-dist \
-        --no-progress
+        --no-progress \
+        --no-audit
 
 # Ahora sí copiamos el resto del proyecto
 COPY . .
