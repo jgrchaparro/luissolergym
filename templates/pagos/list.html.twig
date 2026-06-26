@@ -83,6 +83,29 @@
                 </div>
             </div>
             <div class="col-md-9">
+
+                {# ===== RESUMEN: TOTAL RECAUDADO ===== #}
+                <div class="recaudado-resumen row" ng-hide="$ctrl.loading">
+                    <div class="col-xs-12 col-sm-4">
+                        <div class="recaudado-card recaudado-usd">
+                            <div class="recaudado-label">D&oacute;lares</div>
+                            <div class="recaudado-monto"><small>$</small>{% verbatim %}{{ $ctrl.totales.USD | number:2 }}{% endverbatim %}</div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <div class="recaudado-card recaudado-vef">
+                            <div class="recaudado-label">Bol&iacute;vares</div>
+                            <div class="recaudado-monto"><small>Bs</small>{% verbatim %}{{ $ctrl.totales.VEF | number:2 }}{% endverbatim %}</div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        <div class="recaudado-card recaudado-cop">
+                            <div class="recaudado-label">Pesos</div>
+                            <div class="recaudado-monto"><small>COP</small>{% verbatim %}{{ $ctrl.totales.COP | number:2 }}{% endverbatim %}</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="box">
                     <div class="box-body">
                         <div class="text-center" ng-show="$ctrl.loading">
@@ -131,10 +154,6 @@
                     <div class="box-footer clearfix" ng-hide="$ctrl.loading">
                         <div class="pull-left" style="line-height: 34px;">
                             Mostrando {% verbatim %}{{ $ctrl.items.length }}{% endverbatim %} de {% verbatim %}{{ $ctrl.total }}{% endverbatim %} registros
-                            &nbsp;|&nbsp; <strong>Total recaudado:</strong>
-                            <span class="label label-success" style="font-size: 13px;">$ {% verbatim %}{{ $ctrl.totales.USD | number:2 }}{% endverbatim %}</span>
-                            <span class="label label-primary" style="font-size: 13px;">Bs {% verbatim %}{{ $ctrl.totales.VEF | number:2 }}{% endverbatim %}</span>
-                            <span class="label label-warning" style="font-size: 13px;">COP {% verbatim %}{{ $ctrl.totales.COP | number:2 }}{% endverbatim %}</span>
                         </div>
                         <ul class="pagination pagination-sm no-margin pull-right">
                             <li ng-class="{disabled: $ctrl.paginaActual <= 1}">
@@ -426,6 +445,47 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/toast.css') }}"/>
+    <style>
+        .recaudado-resumen { margin-bottom: 15px; }
+        .recaudado-card {
+            background: #fff;
+            border-radius: 6px;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+            border-left: 3px solid #d2d6de;
+            transition: box-shadow .2s ease, transform .2s ease;
+        }
+        .recaudado-card:hover {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+            transform: translateY(-1px);
+        }
+        .recaudado-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #97a0a8;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .recaudado-monto {
+            font-size: 23px;
+            font-weight: 600;
+            color: #2c3e50;
+            line-height: 1;
+        }
+        .recaudado-monto small {
+            font-size: 13px;
+            font-weight: 600;
+            color: #b4bcc2;
+            margin-right: 4px;
+        }
+        .recaudado-usd { border-left-color: #00a65a; }
+        .recaudado-vef { border-left-color: #3c8dbc; }
+        .recaudado-cop { border-left-color: #f39c12; }
+        @media (max-width: 767px) {
+            .recaudado-card { margin-bottom: 10px; }
+        }
+    </style>
 {% endblock %}
 
 {% block javascripts %}
